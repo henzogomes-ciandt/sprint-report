@@ -7,60 +7,95 @@
 <title>Sprint Report — Semana 1</title>
 <style>
   :root {
-    --ground: #f6f7f9;
-    --surface: #ffffff;
-    --ink: #1b2130;
-    --muted: #5a6474;
-    --faint: #8a93a2;
-    --border: #e5e8ee;
-    --accent: #2e5aac;
-    --accent-soft: #eaf0fb;
-    --good: #2f7d5b;
-    --good-soft: #e7f2ec;
-    --wait: #9a6a12;
-    --wait-soft: #f6eede;
-    --prog: #4b57a6;
-    --prog-soft: #ecedf8;
-    --neutral: #64707f;
-    --neutral-soft: #eceef1;
+    --ground: #f6f7f9; --surface: #ffffff; --ink: #1b2130; --muted: #5a6474; --faint: #8a93a2;
+    --border: #e5e8ee; --accent: #2e5aac; --accent-soft: #eaf0fb;
+    --good: #2f7d5b; --good-soft: #e7f2ec; --wait: #9a6a12; --wait-soft: #f6eede;
+    --prog: #4b57a6; --prog-soft: #ecedf8; --neutral: #64707f; --neutral-soft: #eceef1;
+    --hover: #eef2fb;
     --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 24px 72px; }
-
+  .wrap { max-width: 960px; margin: 0 auto; padding: 52px 24px 72px; }
   .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
   h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance; }
   .daterange { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
 
-  .summary { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0 8px; }
-  .pill { display: inline-flex; align-items: baseline; gap: 7px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; font-size: 13px; color: var(--muted); }
-  .pill b { font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; color: var(--ink); }
-  .pill .d { width: 8px; height: 8px; border-radius: 50%; }
-  .d.done { background: var(--good); } .d.prog { background: var(--prog); } .d.open { background: var(--wait); } .d.noop { background: var(--neutral); }
+  .layout { display: grid; grid-template-columns: minmax(0,1fr) 268px; gap: 28px; align-items: start; margin-top: 30px; }
+  @media (max-width: 740px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static !important; order: -1; } }
 
-  section { margin-top: 32px; }
-  h2 { font-size: 12.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin: 0 0 12px; padding-bottom: 9px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 9px; }
-  h2 .count { font-family: var(--mono); font-weight: 600; color: var(--faint); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .fchip { appearance: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 999px; padding: 6px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+  .fchip span { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--neutral-soft); color: var(--muted); }
+  .fchip:hover { background: var(--hover); }
+  .fchip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .fchip[aria-pressed="true"] span { background: rgba(255,255,255,.25); color: #fff; }
+  .fchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  ul.tickets { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .tk { display: grid; grid-template-columns: 62px 1fr auto; gap: 14px; align-items: center; padding: 13px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; }
-  .tk .id { font-family: var(--mono); font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
-  .tk .t { font-size: 14px; }
-  .tk .t code { font-family: var(--mono); font-size: .85em; background: var(--accent-soft); color: var(--accent); padding: 1px 5px; border-radius: 5px; }
-  .tk .t .kicker { font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: .03em; }
+  .tickets { display: flex; flex-direction: column; gap: 8px; }
+  .empty { color: var(--faint); font-size: 13.5px; padding: 20px 4px; display: none; }
 
-  .chip { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: .01em; white-space: nowrap; }
+  details.tk { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; overflow: hidden; }
+  details.tk[hidden] { display: none; }
+  details.tk > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 14px; padding: 13px 16px; user-select: none; transition: background-color .15s ease; }
+  details.tk > summary::-webkit-details-marker { display: none; }
+  details.tk > summary:hover { background: var(--hover); }
+  details.tk > summary:hover .chev { color: var(--accent); }
+  details.tk:hover { border-color: #d3dae8; }
+  details.tk > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 11px; }
+  details.tk[open] > summary { border-bottom: 1px solid var(--border); }
+  summary .id { font-family: var(--mono); font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; min-width: 52px; }
+  summary .t { font-size: 14px; flex: 1; min-width: 0; }
+  summary .chev { color: var(--faint); font-size: 18px; line-height: 1; transition: transform .18s ease; flex-shrink: 0; }
+  details.tk[open] > summary .chev { transform: rotate(90deg); }
+  @media (prefers-reduced-motion: reduce) { summary .chev, details.tk > summary, .fchip { transition: none; } }
+  .tk .desc { padding: 13px 16px 16px 68px; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .tk .desc code { font-family: var(--mono); font-size: .9em; background: var(--neutral-soft); color: var(--ink); padding: 1px 5px; border-radius: 5px; }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: .01em; white-space: nowrap; flex-shrink: 0; }
   .chip.done { background: var(--good-soft); color: var(--good); }
   .chip.prog { background: var(--prog-soft); color: var(--prog); }
   .chip.open { background: var(--wait-soft); color: var(--wait); }
   .chip.noop { background: var(--neutral-soft); color: var(--neutral); }
 
-  @media (max-width: 540px) {
-    .tk { grid-template-columns: 1fr auto; }
-    .tk .id { grid-column: 1 / -1; }
-  }
+  .sidebar { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 16px 18px; }
+  .card h3 { margin: 0 0 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+
+  .ring { width: 116px; height: 116px; border-radius: 50%; margin: 0 auto 4px;
+    background: conic-gradient(var(--good) 0 77%, var(--neutral-soft) 0 100%); display: grid; place-items: center; }
+  .ring .hole { width: 82px; height: 82px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; text-align: center; }
+  .ring .pct { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .ring .sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .ring-cap { text-align: center; font-size: 12px; color: var(--muted); }
+  .ring-cap b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .stack { display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin-bottom: 12px; }
+  .stack > i { display: block; }
+  .stack .s-done { background: var(--good); } .stack .s-prog { background: var(--prog); } .stack .s-open { background: var(--wait); } .stack .s-noop { background: var(--neutral); }
+  .legend { display: flex; flex-direction: column; gap: 7px; }
+  .legend .row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+  .legend .dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+  .legend .row b { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+  .dot.done { background: var(--good); } .dot.prog { background: var(--prog); } .dot.open { background: var(--wait); } .dot.noop { background: var(--neutral); }
+
+  .effort .top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 9px; }
+  .effort .h { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .effort .h b { font-size: 18px; } .effort .h span { color: var(--muted); font-size: 13px; }
+  .effort .pct { font-family: var(--mono); font-size: 12px; color: var(--good); }
+  .bar { height: 8px; border-radius: 999px; background: var(--neutral-soft); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--good); border-radius: 999px; }
+  .note { font-size: 11px; color: var(--faint); margin: 9px 0 0; }
+
+  .days { display: flex; align-items: flex-end; gap: 7px; height: 84px; margin-top: 4px; }
+  .days .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; }
+  .days .b { width: 100%; max-width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 3px; }
+  .days .b.zero { background: var(--neutral-soft); }
+  .days .n { font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .days .lbl { font-size: 10px; color: var(--faint); }
 </style>
 </head>
 <body>
@@ -71,49 +106,96 @@
     <p class="daterange">29 jun – 03 jul 2026</p>
   </header>
 
-  <div class="summary">
-    <span class="pill"><span class="d done"></span><b>10</b> concluídos</span>
-    <span class="pill"><span class="d prog"></span><b>1</b> em andamento</span>
-    <span class="pill"><span class="d open"></span><b>1</b> em aberto</span>
-    <span class="pill"><span class="d noop"></span><b>1</b> fechado · no-op</span>
+  <div class="layout">
+    <main>
+      <div class="filters" role="group" aria-label="Filtrar por status">
+        <button class="fchip" data-filter="all" aria-pressed="true">Todos <span>13</span></button>
+        <button class="fchip" data-filter="done" aria-pressed="false">Concluídos <span>10</span></button>
+        <button class="fchip" data-filter="prog" aria-pressed="false">Em andamento <span>1</span></button>
+        <button class="fchip" data-filter="open" aria-pressed="false">Em aberto <span>1</span></button>
+        <button class="fchip" data-filter="noop" aria-pressed="false">No-op <span>1</span></button>
+      </div>
+
+      <div class="tickets">
+        <details class="tk" data-status="done"><summary><span class="id">808154</span><span class="t">Configuração de permissões</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Registrou o módulo no pacote de permissões compartilhado (<code>fe-tools</code>) para habilitar o gate de acesso por perfil. Inclui bump de versão do pacote e teste.</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808155</span><span class="t">Roteamento interno (basePath)</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Roteamento interno com React Router sob um <code>basePath</code>, seguindo o padrão já adotado por outros módulos. Inclui rota de showcase protegida para ambientes não-produção.</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808156</span><span class="t">Página de referência de componentes</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Página de showcase da biblioteca de componentes (átomos reconstruídos localmente) como guia de design para devs e IA. Protegida para não-produção.</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808159</span><span class="t">Integração no app host</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Integração do módulo no app host — registro, wrapper e rota protegida por permissão. Passou a consumir o módulo como dependência real do feed (não mais alias local).</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808334</span><span class="t">Home: 3 cards + navegação</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Página inicial com os 3 cards de feature e navegação para páginas stub. Acessibilidade (teclado/aria) e i18n (pt/en/es) cobertos.</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808883</span><span class="t">Testes E2E (harness + rotas)</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Harness de testes E2E (Playwright) co-localizado no repositório do módulo, mais uma suíte de rotas. Execução local/on-demand (estágio de CI adiado por ser dep cross-team).</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808916</span><span class="t">Tech debt: limpeza de lint/type</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Remoção de todas as 28 supressões de lint/type na raiz, trocando comentários de supressão por política de ESLint adequada. Zero warnings ao final.</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808732</span><span class="t">Upload de arquivo + validação</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Tela de upload de arquivo (PDF) com validação no cliente e tratamento de progresso/erro (watchdog de stall + abort).</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808151</span><span class="t">Persistência em Blob Storage</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Camada de persistência do documento em Azure Blob Storage, com validação (magic bytes) e limite de tamanho no caminho de upload.</div></details>
+        <details class="tk" data-status="done"><summary><span class="id">808724</span><span class="t">Orquestração via Storage Queue</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Orquestração via Azure Storage Queue para disparar o pipeline de ingestão de forma assíncrona (event-driven).</div></details>
+        <details class="tk" data-status="prog"><summary><span class="id">807095</span><span class="t">História de upload (guarda-chuva)</span><span class="chip prog">em andamento</span><span class="chev">›</span></summary><div class="desc">História guarda-chuva do upload de arquivo via seleção manual. As tasks de front e backend já concluíram; a história segue aberta para o restante do fluxo (extração/processamento).</div></details>
+        <details class="tk" data-status="open"><summary><span class="id">808160</span><span class="t">Registro do módulo no CMS</span><span class="chip open">em aberto</span><span class="chev">›</span></summary><div class="desc">Registro da entrada do módulo no CMS (catálogo de módulos) — pendente de execução.</div></details>
+        <details class="tk" data-status="noop"><summary><span class="id">808158</span><span class="t">Fiação de props/auth (investigado)</span><span class="chip noop">no-op</span><span class="chev">›</span></summary><div class="desc">Investigação da fiação de props/contexto e auth no wrapper. Conclusão: não era necessária — o app host já provia o essencial e o módulo trata os próprios erros — então foi fechada sem alteração de código (escopo já coberto).</div></details>
+      </div>
+      <p class="empty">Nenhum ticket nesta categoria.</p>
+    </main>
+
+    <aside class="sidebar" aria-label="Métricas da sprint">
+      <div class="card">
+        <h3>Progresso</h3>
+        <div class="ring"><div class="hole"><div><div class="pct">77%</div><div class="sub">concluído</div></div></div></div>
+        <p class="ring-cap"><b>10</b> de <b>13</b> tickets concluídos</p>
+      </div>
+
+      <div class="card">
+        <h3>Por status</h3>
+        <div class="stack" aria-hidden="true">
+          <i class="s-done" style="width:77%"></i><i class="s-prog" style="width:7.7%"></i><i class="s-open" style="width:7.7%"></i><i class="s-noop" style="width:7.6%"></i>
+        </div>
+        <div class="legend">
+          <div class="row"><span class="dot done"></span>Concluídos <b>10</b></div>
+          <div class="row"><span class="dot prog"></span>Em andamento <b>1</b></div>
+          <div class="row"><span class="dot open"></span>Em aberto <b>1</b></div>
+          <div class="row"><span class="dot noop"></span>Fechado · no-op <b>1</b></div>
+        </div>
+      </div>
+
+      <div class="card effort">
+        <h3>Esforço estimado</h3>
+        <div class="top"><span class="h"><b>31</b><span>/34 h</span></span><span class="pct">91%</span></div>
+        <div class="bar"><i style="width:91%"></i></div>
+        <p class="note">Baseado nas estimativas do ADO · 2 itens sem estimativa.</p>
+      </div>
+
+      <div class="card">
+        <h3>Entregas por dia</h3>
+        <div class="days">
+          <div class="col"><span class="n">0</span><div class="b zero" style="height:3px"></div><span class="lbl">seg</span></div>
+          <div class="col"><span class="n">0</span><div class="b zero" style="height:3px"></div><span class="lbl">ter</span></div>
+          <div class="col"><span class="n">4</span><div class="b" style="height:51px"></div><span class="lbl">qua</span></div>
+          <div class="col"><span class="n">2</span><div class="b" style="height:26px"></div><span class="lbl">qui</span></div>
+          <div class="col"><span class="n">5</span><div class="b" style="height:64px"></div><span class="lbl">sex</span></div>
+        </div>
+      </div>
+    </aside>
   </div>
-
-  <section>
-    <h2>Concluídos <span class="count">10</span></h2>
-    <ul class="tickets">
-      <li class="tk"><span class="id">808154</span><span class="t">Registro de permissões no <code>fe-tools</code></span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808155</span><span class="t">Roteamento interno (React Router) sob basePath</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808156</span><span class="t">Página de showcase da lib de componentes</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808159</span><span class="t">Integração do módulo no ContainerApp (registry + wrapper + rota)</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808334</span><span class="t">Home: 3 cards de feature + roteamento</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808883</span><span class="t">Harness de E2E (Playwright) + suíte de rotas</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808916</span><span class="t">Tech debt: remoção de supressões de lint/type</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808732</span><span class="t">Upload de contrato (PDF) + validação</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808151</span><span class="t">Persistência do documento em Azure Blob Storage</span><span class="chip done">concluído</span></li>
-      <li class="tk"><span class="id">808724</span><span class="t">Orquestração via Azure Storage Queue (pipeline assíncrono)</span><span class="chip done">concluído</span></li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Em andamento <span class="count">1</span></h2>
-    <ul class="tickets">
-      <li class="tk"><span class="id">807095</span><span class="t"><span class="kicker">US-2.1 · </span>Upload de contrato via seleção manual de arquivo</span><span class="chip prog">em andamento</span></li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Em aberto <span class="count">1</span></h2>
-    <ul class="tickets">
-      <li class="tk"><span class="id">808160</span><span class="t">Registro do módulo no CMS</span><span class="chip open">em aberto</span></li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Fechado sem alteração <span class="count">1</span></h2>
-    <ul class="tickets">
-      <li class="tk"><span class="id">808158</span><span class="t">Prop/context + auth-wiring do módulo (investigado — escopo já coberto)</span><span class="chip noop">no-op</span></li>
-    </ul>
-  </section>
 </div>
+
+<script>
+  (function () {
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.fchip'));
+    var items = Array.prototype.slice.call(document.querySelectorAll('details.tk'));
+    var empty = document.querySelector('.empty');
+    function apply(filter) {
+      var shown = 0;
+      items.forEach(function (it) {
+        var match = filter === 'all' || it.getAttribute('data-status') === filter;
+        it.hidden = !match;
+        if (match) shown++;
+      });
+      empty.style.display = shown ? 'none' : 'block';
+    }
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        chips.forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
+        apply(c.getAttribute('data-filter'));
+      });
+    });
+  })();
+</script>
 </body>
 </html>
