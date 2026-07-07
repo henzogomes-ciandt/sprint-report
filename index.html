@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Sprint Report — Semana 1 (29 jun – 03 jul 2026)">
-<title>Sprint Report — Semana 1</title>
+<meta name="description" content="Sprint Report — Week 1 (Jun 29 – Jul 3, 2026)">
+<title>Sprint Report — Week 1</title>
 <style>
   :root {
     --ground: #f6f7f9; --surface: #ffffff; --ink: #1b2130; --muted: #5a6474; --faint: #8a93a2;
@@ -18,9 +18,23 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 960px; margin: 0 auto; padding: 52px 24px 72px; }
+
+  /* language toggle */
+  [data-lang="en"] .t-pt { display: none; }
+  [data-lang="pt"] .t-en { display: none; }
+
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px 20px; flex-wrap: wrap; }
+  .hd-main { min-width: 0; }
   .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
   h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance; }
   .daterange { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+
+  .langsw { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: var(--surface); flex-shrink: 0; }
+  .langsw .lang { appearance: none; font: inherit; font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); background: transparent; border: 0; padding: 6px 13px; cursor: pointer; transition: background-color .15s ease, color .15s ease; }
+  .langsw .lang + .lang { border-left: 1px solid var(--border); }
+  .langsw .lang[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .langsw .lang:hover:not([aria-pressed="true"]) { background: var(--hover); }
+  .langsw .lang:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .layout { display: grid; grid-template-columns: minmax(0,1fr) 268px; gap: 28px; align-items: start; margin-top: 30px; }
   @media (max-width: 740px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static !important; order: -1; } }
@@ -29,10 +43,10 @@
   .fchip { appearance: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: var(--surface);
     border: 1px solid var(--border); border-radius: 999px; padding: 6px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
     transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
-  .fchip span { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--neutral-soft); color: var(--muted); }
+  .fchip .ct { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--neutral-soft); color: var(--muted); }
   .fchip:hover { background: var(--hover); }
   .fchip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .fchip[aria-pressed="true"] span { background: rgba(255,255,255,.25); color: #fff; }
+  .fchip[aria-pressed="true"] .ct { background: rgba(255,255,255,.25); color: #fff; }
   .fchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .groups { display: flex; flex-direction: column; gap: 14px; }
@@ -69,7 +83,7 @@
   summary .t { font-size: 13.5px; flex: 1; min-width: 0; }
   summary .chev { color: var(--faint); font-size: 18px; line-height: 1; transition: transform .18s ease; flex-shrink: 0; }
   details.tk[open] > summary .chev { transform: rotate(90deg); }
-  @media (prefers-reduced-motion: reduce) { summary .chev, details.tk > summary, .fchip { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { summary .chev, details.tk > summary, .fchip, .langsw .lang { transition: none; } }
   .tk .desc { padding: 12px 14px 15px 66px; font-size: 13px; color: var(--muted); line-height: 1.6; }
   .tk .desc code { font-family: var(--mono); font-size: .9em; background: var(--neutral-soft); color: var(--ink); padding: 1px 5px; border-radius: 5px; }
 
@@ -100,125 +114,149 @@
   .legend .dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
   .legend .row b { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
   .dot.done { background: var(--good); } .dot.open { background: var(--wait); } .dot.noop { background: var(--neutral); }
-  .effort .top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 9px; }
-  .effort .h { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  .effort .h b { font-size: 18px; } .effort .h span { color: var(--muted); font-size: 13px; }
-  .effort .pct { font-family: var(--mono); font-size: 12px; color: var(--good); }
   .bar { height: 8px; border-radius: 999px; background: var(--neutral-soft); overflow: hidden; }
   .bar > i { display: block; height: 100%; background: var(--good); border-radius: 999px; }
-  .note { font-size: 11px; color: var(--faint); margin: 9px 0 0; }
   .days { display: flex; align-items: flex-end; gap: 7px; height: 84px; margin-top: 4px; }
   .days .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; }
   .days .b { width: 100%; max-width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 3px; }
   .days .b.zero { background: var(--neutral-soft); }
   .days .n { font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink); }
   .days .lbl { font-size: 10px; color: var(--faint); }
+
+  /* report history / archive nav */
+  .reportnav { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .reportnav[hidden] { display: none; }
+  .reportnav .alabel { font-weight: 700; color: var(--faint); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: 11px; }
+  .archive-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .reportnav a { color: var(--accent); text-decoration: none; font-family: var(--mono); font-size: 12.5px; }
+  .reportnav a:hover { text-decoration: underline; }
+  .to-current { display: inline-block; margin-bottom: 16px; }
+  .to-current[hidden], .archive[hidden] { display: none; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Sprint 1</p>
-    <h1>Sprint Report — Semana 1</h1>
-    <p class="daterange">29 jun – 03 jul 2026</p>
+    <div class="hd-main">
+      <p class="eyebrow">Sprint 1</p>
+      <h1>Sprint Report — <span class="t-pt">Semana 1</span><span class="t-en">Week 1</span></h1>
+      <p class="daterange"><span class="t-pt">29 jun – 03 jul 2026</span><span class="t-en">Jun 29 – Jul 3, 2026</span></p>
+    </div>
+    <div class="langsw" role="group" aria-label="Language / Idioma">
+      <button type="button" class="lang" data-lang-set="pt" aria-pressed="false">PT</button>
+      <button type="button" class="lang" data-lang-set="en" aria-pressed="true">EN</button>
+    </div>
   </header>
 
   <div class="layout">
     <main>
-      <div class="filters" role="group" aria-label="Filtrar tasks por status">
-        <button class="fchip" data-filter="all" aria-pressed="true">Todos <span>13</span></button>
-        <button class="fchip" data-filter="done" aria-pressed="false">Concluídos <span>11</span></button>
-        <button class="fchip" data-filter="open" aria-pressed="false">Em aberto <span>1</span></button>
-        <button class="fchip" data-filter="noop" aria-pressed="false">No-op <span>1</span></button>
+      <div class="filters" role="group" aria-label="Filter tasks by status">
+        <button class="fchip" data-filter="all" aria-pressed="true"><span class="t-pt">Todos</span><span class="t-en">All</span> <span class="ct">13</span></button>
+        <button class="fchip" data-filter="done" aria-pressed="false"><span class="t-pt">Concluídos</span><span class="t-en">Completed</span> <span class="ct">11</span></button>
+        <button class="fchip" data-filter="open" aria-pressed="false"><span class="t-pt">Em aberto</span><span class="t-en">Open</span> <span class="ct">1</span></button>
+        <button class="fchip" data-filter="noop" aria-pressed="false"><span class="t-pt">No-op</span><span class="t-en">No-op</span> <span class="ct">1</span></button>
       </div>
 
       <div class="groups">
         <details class="sg" open>
           <summary class="sg-head">
-            <div class="top"><span class="id">807084</span><span class="title">US-1.1 · Acessar as seções da plataforma pela Home</span><span class="chip active">ativa</span><span class="chev">›</span></div>
+            <div class="top"><span class="id">807084</span><span class="title">US-1.1 · <span class="t-pt">Acessar as seções da plataforma pela Home</span><span class="t-en">Access the platform sections from the Home page</span></span><span class="chip active"><span class="t-pt">ativa</span><span class="t-en">active</span></span><span class="chev">›</span></div>
             <div class="s-prog"><div class="s-bar"><i style="width:90%"></i></div><span class="s-frac">9/10 tasks</span></div>
           </summary>
           <div class="sg-tasks">
-            <details class="tk" data-status="done"><summary><span class="id">808154</span><span class="t">Configuração de permissões</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Registrou o módulo no pacote de permissões compartilhado (<code>fe-tools</code>) para habilitar o gate de acesso por perfil. Inclui bump de versão do pacote e teste.</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808155</span><span class="t">Roteamento interno (basePath)</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Roteamento interno com React Router sob um <code>basePath</code>, seguindo o padrão já adotado por outros módulos. Inclui rota de showcase protegida para ambientes não-produção.</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808156</span><span class="t">Página de referência de componentes</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Página de showcase da biblioteca de componentes (átomos reconstruídos localmente) como guia de design para devs e IA. Protegida para não-produção.</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808159</span><span class="t">Integração no app host</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Integração do módulo no app host — registro, wrapper e rota protegida por permissão. Passou a consumir o módulo como dependência real do feed (não mais alias local).</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808161</span><span class="t">Header do shell na rota</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Renderiza o header do app host na rota do módulo (seletor de site + menu do usuário), reutilizando o componente do container — sem reconstruir nada dentro do módulo.</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808334</span><span class="t">Home: 3 cards + navegação</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Página inicial com os 3 cards de feature e navegação para páginas stub. Acessibilidade (teclado/aria) e i18n (pt/en/es) cobertos.</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808883</span><span class="t">Testes E2E (harness + rotas)</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Harness de testes E2E (Playwright) co-localizado no repositório do módulo, mais uma suíte de rotas. Execução local/on-demand (estágio de CI adiado por ser dep cross-team).</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808916</span><span class="t">Tech debt: limpeza de lint/type</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Remoção de todas as 28 supressões de lint/type na raiz, trocando comentários de supressão por política de ESLint adequada. Zero warnings ao final.</div></details>
-            <details class="tk" data-status="noop"><summary><span class="id">808158</span><span class="t">Fiação de props/auth (investigado)</span><span class="chip noop">no-op</span><span class="chev">›</span></summary><div class="desc">Investigação da fiação de props/contexto e auth no wrapper. Conclusão: não era necessária — o app host já provia o essencial e o módulo trata os próprios erros — então foi fechada sem alteração de código (escopo já coberto).</div></details>
-            <details class="tk" data-status="open"><summary><span class="id">808160</span><span class="t">Registro do módulo no Strapi</span><span class="chip open">em aberto</span><span class="chev">›</span></summary><div class="desc">Registro da entrada do módulo no Strapi (catálogo de módulos) — pendente de execução.</div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808154</span><span class="t"><span class="t-pt">Configuração de permissões</span><span class="t-en">Permissions configuration</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Registrou o módulo no pacote de permissões compartilhado (<code>fe-tools</code>) para habilitar o gate de acesso por perfil. Inclui bump de versão do pacote e teste.</span><span class="t-en">Registered the module in the shared permissions package (<code>fe-tools</code>) to enable role-based access gating. Includes a package version bump and a test.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808155</span><span class="t"><span class="t-pt">Roteamento interno (basePath)</span><span class="t-en">Internal routing (basePath)</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Roteamento interno com React Router sob um <code>basePath</code>, seguindo o padrão já adotado por outros módulos. Inclui rota de showcase protegida para ambientes não-produção.</span><span class="t-en">Internal routing with React Router under a <code>basePath</code>, following the pattern already adopted by other modules. Includes a showcase route protected for non-production environments.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808156</span><span class="t"><span class="t-pt">Página de referência de componentes</span><span class="t-en">Component reference page</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Página de showcase da biblioteca de componentes (átomos reconstruídos localmente) como guia de design para devs e IA. Protegida para não-produção.</span><span class="t-en">Showcase page of the component library (atoms rebuilt locally) as a design guide for devs and AI. Protected for non-production.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808159</span><span class="t"><span class="t-pt">Integração no app host</span><span class="t-en">Integration into the host app</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Integração do módulo no app host — registro, wrapper e rota protegida por permissão. Passou a consumir o módulo como dependência real do feed (não mais alias local).</span><span class="t-en">Module integration into the host app — registration, wrapper, and permission-protected route. Now consumes the module as a real feed dependency (no longer a local alias).</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808161</span><span class="t"><span class="t-pt">Header do shell na rota</span><span class="t-en">Shell header on the route</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Renderiza o header do app host na rota do módulo (seletor de site + menu do usuário), reutilizando o componente do container — sem reconstruir nada dentro do módulo.</span><span class="t-en">Renders the host app header on the module route (site selector + user menu), reusing the container's component — without rebuilding anything inside the module.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808334</span><span class="t"><span class="t-pt">Home: 3 cards + navegação</span><span class="t-en">Home: 3 cards + navigation</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Página inicial com os 3 cards de feature e navegação para páginas stub. Acessibilidade (teclado/aria) e i18n (pt/en/es) cobertos.</span><span class="t-en">Home page with the 3 feature cards and navigation to stub pages. Accessibility (keyboard/aria) and i18n (pt/en/es) covered.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808883</span><span class="t"><span class="t-pt">Testes E2E (harness + rotas)</span><span class="t-en">E2E tests (harness + routes)</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Harness de testes E2E (Playwright) co-localizado no repositório do módulo, mais uma suíte de rotas. Execução local/on-demand (estágio de CI adiado por ser dep cross-team).</span><span class="t-en">E2E test harness (Playwright) co-located in the module repository, plus a routes suite. Local/on-demand execution (CI stage deferred as it's a cross-team dependency).</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808916</span><span class="t"><span class="t-pt">Tech debt: limpeza de lint/type</span><span class="t-en">Tech debt: lint/type cleanup</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Remoção de todas as 28 supressões de lint/type na raiz, trocando comentários de supressão por política de ESLint adequada. Zero warnings ao final.</span><span class="t-en">Removed all 28 lint/type suppressions at the root, replacing suppression comments with a proper ESLint policy. Zero warnings at the end.</span></div></details>
+            <details class="tk" data-status="noop"><summary><span class="id">808158</span><span class="t"><span class="t-pt">Fiação de props/auth (investigado)</span><span class="t-en">Props/auth wiring (investigated)</span></span><span class="chip noop"><span class="t-pt">no-op</span><span class="t-en">no-op</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Investigação da fiação de props/contexto e auth no wrapper. Conclusão: não era necessária — o app host já provia o essencial e o módulo trata os próprios erros — então foi fechada sem alteração de código (escopo já coberto).</span><span class="t-en">Investigation of props/context and auth wiring in the wrapper. Conclusion: it wasn't needed — the host app already provided the essentials and the module handles its own errors — so it was closed with no code change (scope already covered).</span></div></details>
+            <details class="tk" data-status="open"><summary><span class="id">808160</span><span class="t"><span class="t-pt">Registro do módulo no Strapi</span><span class="t-en">Module registration in Strapi</span></span><span class="chip open"><span class="t-pt">em aberto</span><span class="t-en">open</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Registro da entrada do módulo no Strapi (catálogo de módulos) — pendente de execução.</span><span class="t-en">Registration of the module entry in Strapi (module catalog) — pending execution.</span></div></details>
           </div>
         </details>
 
         <details class="sg" open>
           <summary class="sg-head">
-            <div class="top"><span class="id">807095</span><span class="title">US-2.1 · Upload de contrato (PDF) via seleção manual</span><span class="chip review">em review</span><span class="chev">›</span></div>
+            <div class="top"><span class="id">807095</span><span class="title">US-2.1 · <span class="t-pt">Upload de contrato (PDF) via seleção manual</span><span class="t-en">Contract upload (PDF) via manual selection</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></div>
             <div class="s-prog"><div class="s-bar"><i style="width:100%"></i></div><span class="s-frac">3/3 tasks</span></div>
           </summary>
           <div class="sg-tasks">
-            <details class="tk" data-status="done"><summary><span class="id">808732</span><span class="t">Upload de contrato + validação</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Tela de upload de contrato (PDF) com validação no cliente e tratamento de progresso/erro (watchdog de stall + abort).</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808151</span><span class="t">Persistência em Blob Storage</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Camada de persistência do contrato em Azure Blob Storage, com validação (magic bytes) e limite de tamanho no caminho de upload.</div></details>
-            <details class="tk" data-status="done"><summary><span class="id">808724</span><span class="t">Orquestração via Storage Queue</span><span class="chip done">concluído</span><span class="chev">›</span></summary><div class="desc">Orquestração via Azure Storage Queue para disparar o pipeline de ingestão de forma assíncrona (event-driven).</div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808732</span><span class="t"><span class="t-pt">Upload de contrato + validação</span><span class="t-en">Contract upload + validation</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Tela de upload de contrato (PDF) com validação no cliente e tratamento de progresso/erro (watchdog de stall + abort).</span><span class="t-en">Contract upload screen (PDF) with client-side validation and progress/error handling (stall watchdog + abort).</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808151</span><span class="t"><span class="t-pt">Persistência em Blob Storage</span><span class="t-en">Persistence in Blob Storage</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Camada de persistência do contrato em Azure Blob Storage, com validação (magic bytes) e limite de tamanho no caminho de upload.</span><span class="t-en">Contract persistence layer in Azure Blob Storage, with validation (magic bytes) and a size limit on the upload path.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">808724</span><span class="t"><span class="t-pt">Orquestração via Storage Queue</span><span class="t-en">Orchestration via Storage Queue</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Orquestração via Azure Storage Queue para disparar o pipeline de ingestão de forma assíncrona (event-driven).</span><span class="t-en">Orchestration via Azure Storage Queue to trigger the ingestion pipeline asynchronously (event-driven).</span></div></details>
           </div>
         </details>
 
         <details class="sg na">
           <summary class="sg-head">
-            <div class="top"><span class="id">807097</span><span class="title">US-4.1 · Ver a lista/portfólio de contratos</span><span class="chip ready">pronta p/ dev</span><span class="chev">›</span></div>
-            <div class="s-prog"><div class="s-bar"><i style="width:0%"></i></div><span class="s-frac">não iniciada</span></div>
+            <div class="top"><span class="id">807097</span><span class="title">US-4.1 · <span class="t-pt">Ver a lista/portfólio de contratos</span><span class="t-en">View the contract list/portfolio</span></span><span class="chip ready"><span class="t-pt">pronta p/ dev</span><span class="t-en">ready for dev</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:0%"></i></div><span class="s-frac"><span class="t-pt">não iniciada</span><span class="t-en">not started</span></span></div>
           </summary>
-          <div class="sg-empty">Sem tasks nesta sprint.</div>
+          <div class="sg-empty"><span class="t-pt">Sem tasks nesta sprint.</span><span class="t-en">No tasks this sprint.</span></div>
         </details>
         <details class="sg na">
           <summary class="sg-head">
-            <div class="top"><span class="id">807098</span><span class="title">US-4.3 · Navegar a lista de contratos com paginação</span><span class="chip noop">backlog</span><span class="chev">›</span></div>
-            <div class="s-prog"><div class="s-bar"><i style="width:0%"></i></div><span class="s-frac">não iniciada</span></div>
+            <div class="top"><span class="id">807098</span><span class="title">US-4.3 · <span class="t-pt">Navegar a lista de contratos com paginação</span><span class="t-en">Browse the contract list with pagination</span></span><span class="chip noop"><span class="t-pt">backlog</span><span class="t-en">backlog</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:0%"></i></div><span class="s-frac"><span class="t-pt">não iniciada</span><span class="t-en">not started</span></span></div>
           </summary>
-          <div class="sg-empty">Sem tasks nesta sprint.</div>
+          <div class="sg-empty"><span class="t-pt">Sem tasks nesta sprint.</span><span class="t-en">No tasks this sprint.</span></div>
         </details>
         <details class="sg na">
           <summary class="sg-head">
-            <div class="top"><span class="id">807099</span><span class="title">US-5.1 · Abrir um contrato e ver o cabeçalho de resumo</span><span class="chip noop">backlog</span><span class="chev">›</span></div>
-            <div class="s-prog"><div class="s-bar"><i style="width:0%"></i></div><span class="s-frac">não iniciada</span></div>
+            <div class="top"><span class="id">807099</span><span class="title">US-5.1 · <span class="t-pt">Abrir um contrato e ver o cabeçalho de resumo</span><span class="t-en">Open a contract and see the summary header</span></span><span class="chip noop"><span class="t-pt">backlog</span><span class="t-en">backlog</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:0%"></i></div><span class="s-frac"><span class="t-pt">não iniciada</span><span class="t-en">not started</span></span></div>
           </summary>
-          <div class="sg-empty">Sem tasks nesta sprint.</div>
+          <div class="sg-empty"><span class="t-pt">Sem tasks nesta sprint.</span><span class="t-en">No tasks this sprint.</span></div>
         </details>
       </div>
-      <p class="empty-all">Nenhuma task nesta categoria.</p>
+      <p class="empty-all"><span class="t-pt">Nenhuma task nesta categoria.</span><span class="t-en">No tasks in this category.</span></p>
     </main>
 
-    <aside class="sidebar" aria-label="Métricas da sprint">
+    <aside class="sidebar" aria-label="Sprint metrics">
       <div class="card">
-        <h3>Progresso (tasks)</h3>
-        <div class="ring"><div class="hole"><div><div class="pct">85%</div><div class="sub">concluído</div></div></div></div>
-        <p class="ring-cap"><b>11</b> de <b>13</b> tasks concluídas</p>
+        <h3><span class="t-pt">Progresso (tasks)</span><span class="t-en">Progress (tasks)</span></h3>
+        <div class="ring"><div class="hole"><div><div class="pct">85%</div><div class="sub"><span class="t-pt">concluído</span><span class="t-en">complete</span></div></div></div></div>
+        <p class="ring-cap"><span class="t-pt"><b>11</b> de <b>13</b> tasks concluídas</span><span class="t-en"><b>11</b> of <b>13</b> tasks completed</span></p>
       </div>
       <div class="card">
-        <h3>Por status</h3>
+        <h3><span class="t-pt">Por status</span><span class="t-en">By status</span></h3>
         <div class="stack" aria-hidden="true"><i class="s-done" style="width:84.6%"></i><i class="s-open" style="width:7.7%"></i><i class="s-noop" style="width:7.7%"></i></div>
         <div class="legend">
-          <div class="row"><span class="dot done"></span>Concluídos <b>11</b></div>
-          <div class="row"><span class="dot open"></span>Em aberto <b>1</b></div>
-          <div class="row"><span class="dot noop"></span>Fechado · no-op <b>1</b></div>
+          <div class="row"><span class="dot done"></span><span class="t-pt">Concluídos</span><span class="t-en">Completed</span> <b>11</b></div>
+          <div class="row"><span class="dot open"></span><span class="t-pt">Em aberto</span><span class="t-en">Open</span> <b>1</b></div>
+          <div class="row"><span class="dot noop"></span><span class="t-pt">Fechado · no-op</span><span class="t-en">Closed · no-op</span> <b>1</b></div>
         </div>
       </div>
       <div class="card">
-        <h3>Entregas por dia</h3>
+        <h3><span class="t-pt">Entregas por dia</span><span class="t-en">Deliveries per day</span></h3>
         <div class="days">
-          <div class="col"><span class="n">0</span><div class="b zero" style="height:3px"></div><span class="lbl">seg</span></div>
-          <div class="col"><span class="n">0</span><div class="b zero" style="height:3px"></div><span class="lbl">ter</span></div>
-          <div class="col"><span class="n">4</span><div class="b" style="height:43px"></div><span class="lbl">qua</span></div>
-          <div class="col"><span class="n">2</span><div class="b" style="height:21px"></div><span class="lbl">qui</span></div>
-          <div class="col"><span class="n">6</span><div class="b" style="height:64px"></div><span class="lbl">sex</span></div>
+          <div class="col"><span class="n">0</span><div class="b zero" style="height:3px"></div><span class="lbl"><span class="t-pt">seg</span><span class="t-en">Mon</span></span></div>
+          <div class="col"><span class="n">0</span><div class="b zero" style="height:3px"></div><span class="lbl"><span class="t-pt">ter</span><span class="t-en">Tue</span></span></div>
+          <div class="col"><span class="n">4</span><div class="b" style="height:43px"></div><span class="lbl"><span class="t-pt">qua</span><span class="t-en">Wed</span></span></div>
+          <div class="col"><span class="n">2</span><div class="b" style="height:21px"></div><span class="lbl"><span class="t-pt">qui</span><span class="t-en">Thu</span></span></div>
+          <div class="col"><span class="n">6</span><div class="b" style="height:64px"></div><span class="lbl"><span class="t-pt">sex</span><span class="t-en">Fri</span></span></div>
         </div>
       </div>
     </aside>
   </div>
+
+  <footer class="reportnav" hidden>
+    <a class="to-current" href="index.html" hidden><span class="t-pt">← Relatório atual</span><span class="t-en">← Current report</span></a>
+    <nav class="archive" aria-label="Previous reports" hidden>
+      <span class="alabel"><span class="t-pt">Relatórios anteriores</span><span class="t-en">Previous reports</span></span>
+      <ul class="archive-list">
+        <!-- Rotation (from week 2 on): add one <li> per archived week, e.g.
+        <li><a href="week1.html"><span class="t-pt">Semana 1</span><span class="t-en">Week 1</span></a></li>
+        -->
+      </ul>
+    </nav>
+  </footer>
 </div>
 
 <script>
+  // Status filter (unchanged — keys off data-status, independent of language)
   (function () {
     var chips = Array.prototype.slice.call(document.querySelectorAll('.fchip'));
     var groups = Array.prototype.slice.call(document.querySelectorAll('.sg'));
@@ -248,6 +286,52 @@
         apply(c.getAttribute('data-filter'));
       });
     });
+  })();
+
+  // Language switcher (PT/EN) — inline dual-text toggled via [data-lang]; patches attrs CSS can't reach
+  (function () {
+    var root = document.documentElement;
+    var KEY = 'report-lang';
+    var STR = {
+      en: { htmllang: 'en',    title: 'Sprint Report — Week 1',   desc: 'Sprint Report — Week 1 (Jun 29 – Jul 3, 2026)',    ariaFilter: 'Filter tasks by status',  ariaMetrics: 'Sprint metrics',    ariaArchive: 'Previous reports' },
+      pt: { htmllang: 'pt-BR', title: 'Sprint Report — Semana 1', desc: 'Sprint Report — Semana 1 (29 jun – 03 jul 2026)', ariaFilter: 'Filtrar tasks por status', ariaMetrics: 'Métricas da sprint', ariaArchive: 'Relatórios anteriores' }
+    };
+    var btns = Array.prototype.slice.call(document.querySelectorAll('.lang'));
+    var filterGroup = document.querySelector('.filters');
+    var sidebar = document.querySelector('.sidebar');
+    var archiveNav = document.querySelector('.archive');
+    var meta = document.querySelector('meta[name="description"]');
+    function setLang(lang) {
+      if (lang !== 'pt' && lang !== 'en') lang = 'en';
+      var s = STR[lang];
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', s.htmllang);
+      document.title = s.title;
+      if (meta) meta.setAttribute('content', s.desc);
+      if (filterGroup) filterGroup.setAttribute('aria-label', s.ariaFilter);
+      if (sidebar) sidebar.setAttribute('aria-label', s.ariaMetrics);
+      if (archiveNav) archiveNav.setAttribute('aria-label', s.ariaArchive);
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang-set') === lang ? 'true' : 'false'); });
+      try { localStorage.setItem(KEY, lang); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    setLang(saved || 'en');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () { setLang(b.getAttribute('data-lang-set')); });
+    });
+  })();
+
+  // Report history: reveal archive list when it has entries; show back-link only on archived (week{N}.html) pages
+  (function () {
+    var footer = document.querySelector('.reportnav');
+    var archiveNav = document.querySelector('.archive');
+    var list = document.querySelector('.archive-list');
+    var toCurrent = document.querySelector('.to-current');
+    var show = false;
+    if (list && list.querySelectorAll('li').length > 0) { if (archiveNav) archiveNav.hidden = false; show = true; }
+    if (toCurrent && /week\d+\.html$/i.test(location.pathname)) { toCurrent.hidden = false; show = true; }
+    if (footer && show) footer.hidden = false;
   })();
 </script>
 </body>
