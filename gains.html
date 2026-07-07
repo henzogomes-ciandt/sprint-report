@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Gains Analysis — Week 1</title>
+<style>
+  :root {
+    --ground: #f6f7f9; --surface: #ffffff; --ink: #1b2130; --muted: #5a6474; --faint: #8a93a2;
+    --border: #e5e8ee; --accent: #2e5aac; --accent-soft: #eaf0fb;
+    --good: #2f7d5b; --good-soft: #e7f2ec; --warn: #9a6a12; --warn-soft: #f6eede; --warn-bd: #e6d6ad;
+    --neutral: #64707f; --neutral-soft: #eceef1; --hover: #eef2fb;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 72px; }
+
+  /* language toggle */
+  [data-lang="en"] .t-pt { display: none; }
+  [data-lang="pt"] .t-en { display: none; }
+
+  header { position: relative; }
+  .hd-main { min-width: 0; }
+  .backlink { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--accent); text-decoration: none; margin-bottom: 14px; }
+  .backlink:hover { text-decoration: underline; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+  h1 { font-size: clamp(26px, 4.5vw, 36px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance; }
+  .daterange { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+  .lead { color: var(--muted); font-size: 14.5px; margin: 16px 0 0; max-width: 70ch; }
+
+  .langsw { position: absolute; top: 0; right: 0; display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: var(--surface); }
+  .langsw .lang { appearance: none; font: inherit; font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); background: transparent; border: 0; padding: 6px 13px; cursor: pointer; transition: background-color .15s ease, color .15s ease; }
+  .langsw .lang + .lang { border-left: 1px solid var(--border); }
+  .langsw .lang[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .langsw .lang:hover:not([aria-pressed="true"]) { background: var(--hover); }
+  .langsw .lang:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .langsw .lang { transition: none; } }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 30px 0 8px; }
+  @media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 16px 18px; }
+  .kpi .lbl { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin: 0 0 10px; }
+  .kpi .val { font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .kpi .val small { font-size: 15px; font-weight: 600; color: var(--muted); }
+  .kpi.hl { background: var(--good-soft); border-color: #cfe6d9; }
+  .kpi.hl .val { color: var(--good); }
+  .kpi .cap { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
+
+  .sec-h { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin: 34px 0 12px; }
+
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 720px; }
+  thead th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--faint);
+    padding: 12px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th.num, tbody td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: #fafbfd; }
+  td .id { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  td .task { font-weight: 600; color: var(--ink); }
+  td .cat { display: inline-block; font-size: 10.5px; font-family: var(--mono); color: var(--muted); background: var(--neutral-soft); border-radius: 999px; padding: 2px 8px; margin-top: 5px; }
+  td.gain { color: var(--good); font-weight: 700; }
+  td.mult { color: var(--accent); font-weight: 700; }
+  .cw { color: var(--faint); font-size: 11px; }
+  tfoot td { padding: 13px 14px; border-top: 2px solid var(--border); font-weight: 700; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  tfoot td.lbl { text-align: left; font-family: var(--sans); letter-spacing: .02em; }
+  tfoot td.gain { color: var(--good); } tfoot td.mult { color: var(--accent); }
+
+  .notes { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 18px 20px; margin-top: 16px; }
+  .notes h3 { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--ink); }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li { font-size: 12.5px; color: var(--muted); margin: 7px 0; line-height: 1.55; }
+  .notes code { font-family: var(--mono); font-size: .9em; background: var(--neutral-soft); color: var(--ink); padding: 1px 5px; border-radius: 5px; }
+
+  footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--faint); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hd-main">
+      <a class="backlink" href="index.html"><span class="t-pt">← Relatório da sprint</span><span class="t-en">← Sprint report</span></a>
+      <p class="eyebrow"><span class="t-pt">Análise de ganhos · Sprint 1</span><span class="t-en">Gains analysis · Sprint 1</span></p>
+      <h1><span class="t-pt">Ganhos de produtividade com desenvolvimento agêntico</span><span class="t-en">Productivity gains from agentic development</span></h1>
+      <p class="daterange"><span class="t-pt">29 jun – 03 jul 2026 · 11 tasks entregues</span><span class="t-en">Jun 29 – Jul 3, 2026 · 11 tasks delivered</span></p>
+      <p class="lead"><span class="t-pt">Comparação entre o esforço estimado <b>com IA (agentic)</b> — registrado no ADO ao dimensionar cada task já contando com o agente — e a estimativa de quanto o mesmo trabalho custaria a um <b>desenvolvedor sênior sem IA</b>. A diferença é o ganho de tempo.</span><span class="t-en">Comparison between the estimated effort <b>with AI (agentic)</b> — logged in ADO when sizing each task already assuming the agent — and the estimate of how long the same work would cost a <b>senior developer without AI</b>. The difference is the time saved.</span></p>
+    </div>
+    <div class="langsw" role="group" aria-label="Language / Idioma">
+      <button type="button" class="lang" data-lang-set="pt" aria-pressed="false">PT</button>
+      <button type="button" class="lang" data-lang-set="en" aria-pressed="true">EN</button>
+    </div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi">
+      <p class="lbl"><span class="t-pt">Estimativa manual</span><span class="t-en">Manual estimate</span></p>
+      <div class="val">87<small>h</small></div>
+      <p class="cap"><span class="t-pt">Sênior, sem IA</span><span class="t-en">Senior, no AI</span></p>
+    </div>
+    <div class="kpi">
+      <p class="lbl"><span class="t-pt">Horas com IA</span><span class="t-en">Hours with AI</span></p>
+      <div class="val">36<small>h</small></div>
+      <p class="cap"><span class="t-pt">Estimativa agentic (ADO)</span><span class="t-en">Agentic estimate (ADO)</span></p>
+    </div>
+    <div class="kpi hl">
+      <p class="lbl"><span class="t-pt">Horas economizadas</span><span class="t-en">Hours saved</span></p>
+      <div class="val">51<small>h</small></div>
+      <p class="cap"><span class="t-pt">≈ 1,3 semana de trabalho</span><span class="t-en">≈ 1.3 work weeks</span></p>
+    </div>
+    <div class="kpi hl">
+      <p class="lbl"><span class="t-pt">Fator de aceleração</span><span class="t-en">Acceleration factor</span></p>
+      <div class="val"><span class="t-pt">2,4</span><span class="t-en">2.4</span><small>×</small></div>
+      <p class="cap"><span class="t-pt">Manual ÷ com IA</span><span class="t-en">Manual ÷ with AI</span></p>
+    </div>
+  </div>
+
+  <p class="sec-h"><span class="t-pt">Detalhe por task</span><span class="t-en">Per-task detail</span></p>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th class="num"><span class="t-pt">Manual (sem IA)</span><span class="t-en">Manual (no AI)</span></th>
+          <th class="num"><span class="t-pt">Com IA (ADO)</span><span class="t-en">With AI (ADO)</span></th>
+          <th class="num"><span class="t-pt">Economia</span><span class="t-en">Saved</span></th>
+          <th class="num"><span class="t-pt">Fator</span><span class="t-en">Factor</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="id">808154</span><br><span class="task"><span class="t-pt">Registro do módulo no pacote de permissões compartilhado + bump + teste</span><span class="t-en">Register the module in the shared permissions package + bump + test</span></span><br><span class="cat"><span class="t-pt">integração</span><span class="t-en">integration</span></span></td>
+          <td class="num">5h</td><td class="num">2h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">3h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808155</span><br><span class="task"><span class="t-pt">Roteamento interno (React Router, basePath) + rota de showcase</span><span class="t-en">Internal routing (React Router, basePath) + showcase route</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
+          <td class="num">6h</td><td class="num">2h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808156</span><br><span class="task"><span class="t-pt">Página de showcase de componentes (átomos reconstruídos localmente)</span><span class="t-en">Component showcase page (atoms rebuilt locally)</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
+          <td class="num">10h</td><td class="num">3h</td><td class="num gain">7h</td><td class="num mult"><span class="t-pt">3,3×</span><span class="t-en">3.3×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808159</span><br><span class="task"><span class="t-pt">Integração no app host — registry, wrapper, rota protegida, dependência real</span><span class="t-en">Host-app integration — registry, wrapper, protected route, real dependency</span></span><br><span class="cat"><span class="t-pt">integração</span><span class="t-en">integration</span></span></td>
+          <td class="num">8h</td><td class="num">3h <span class="cw"><span class="t-pt">(real 3h)</span><span class="t-en">(actual 3h)</span></span></td><td class="num gain">5h</td><td class="num mult"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808161</span><br><span class="task"><span class="t-pt">Header do shell na rota (reutilizando o componente do container)</span><span class="t-en">Shell header on the route (reusing the container's component)</span></span><br><span class="cat"><span class="t-pt">integração</span><span class="t-en">integration</span></span></td>
+          <td class="num">10h</td><td class="num">6h</td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">1,7×</span><span class="t-en">1.7×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808334</span><br><span class="task"><span class="t-pt">Home: 3 cards de feature + navegação + acessibilidade + i18n</span><span class="t-en">Home: 3 feature cards + navigation + accessibility + i18n</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
+          <td class="num">7h</td><td class="num">2h</td><td class="num gain">5h</td><td class="num mult"><span class="t-pt">3,5×</span><span class="t-en">3.5×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808883</span><br><span class="task"><span class="t-pt">Harness de testes E2E (Playwright) + suíte de rotas</span><span class="t-en">E2E test harness (Playwright) + routes suite</span></span><br><span class="cat"><span class="t-pt">infra de testes</span><span class="t-en">test infra</span></span></td>
+          <td class="num">10h</td><td class="num">4h <span class="cw"><span class="t-pt">(real 2h)</span><span class="t-en">(actual 2h)</span></span></td><td class="num gain">6h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808916</span><br><span class="task"><span class="t-pt">Tech debt: remoção das 28 supressões de lint/type + política de ESLint</span><span class="t-en">Tech debt: remove the 28 lint/type suppressions + ESLint policy</span></span><br><span class="cat"><span class="t-pt">limpeza</span><span class="t-en">cleanup</span></span></td>
+          <td class="num">6h</td><td class="num">2h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808732</span><br><span class="task"><span class="t-pt">Upload de contrato (PDF) + validação + progresso/erro (watchdog + abort)</span><span class="t-en">Contract upload (PDF) + validation + progress/error (watchdog + abort)</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
+          <td class="num">9h</td><td class="num">4h</td><td class="num gain">5h</td><td class="num mult"><span class="t-pt">2,3×</span><span class="t-en">2.3×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808151</span><br><span class="task"><span class="t-pt">Persistência em Azure Blob Storage + validação (magic bytes, limite de tamanho)</span><span class="t-en">Azure Blob Storage persistence + validation (magic bytes, size limit)</span></span><br><span class="cat"><span class="t-pt">backend</span><span class="t-en">backend</span></span></td>
+          <td class="num">8h</td><td class="num">4h</td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
+        </tr>
+        <tr>
+          <td><span class="id">808724</span><br><span class="task"><span class="t-pt">Orquestração via Azure Storage Queue (ingestão event-driven)</span><span class="t-en">Orchestration via Azure Storage Queue (event-driven ingestion)</span></span><br><span class="cat"><span class="t-pt">backend</span><span class="t-en">backend</span></span></td>
+          <td class="num">8h</td><td class="num">4h</td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="lbl"><span class="t-pt">Total — 11 tasks entregues</span><span class="t-en">Total — 11 tasks delivered</span></td>
+          <td class="num">87h</td>
+          <td class="num">36h</td>
+          <td class="num gain">51h</td>
+          <td class="num mult"><span class="t-pt">2,4×</span><span class="t-en">2.4×</span></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="notes">
+    <h3><span class="t-pt">Metodologia e premissas</span><span class="t-en">Methodology &amp; assumptions</span></h3>
+    <ul>
+      <li><span class="t-pt"><b>Horas com IA</b> = <code>OriginalEstimate</code> do ADO — dimensionado já contando com o agente. É o campo preenchido de forma consistente; onde há <code>CompletedWork</code> (real), o valor foi <i>menor</i> que a estimativa (o agente superou a própria estimativa), então o ganho aqui está <b>subestimado</b>, não inflado.</span><span class="t-en"><b>Hours with AI</b> = ADO <code>OriginalEstimate</code> — sized already assuming the agent. It's the consistently-filled field; where <code>CompletedWork</code> (actual) exists it was <i>lower</i> than the estimate (the agent beat its own estimate), so the gain here is <b>understated</b>, not inflated.</span></li>
+      <li><span class="t-pt"><b>Estimativa manual (sem IA)</b> = tempo de um desenvolvedor sênior fazendo a task sem IA, ciclo completo (entender o requisito e o código → implementar → testar → abrir PR → ciclos de review). Estimada task a task a partir do escopo real do que foi entregue, não de uma fórmula. O agente comprime justamente os custos fixos humanos (leitura de código, boilerplate, testes, iterações de review); por isso o multiplicador é maior em tasks de scaffolding/integração e menor onde a lógica/decisão de design domina. Multiplicadores deliberadamente conservadores (1,7–3,5×; 2,4× no total).</span><span class="t-en"><b>Manual estimate (no AI)</b> = a senior developer doing the task without AI, full cycle (understand the requirement and the code → implement → test → open the PR → review iterations). Estimated task by task from the actual scope of what was delivered, not from a formula. The agent compresses exactly the fixed human costs (reading code, boilerplate, tests, review iterations); that's why the multiplier is higher on scaffolding/integration tasks and lower where logic/design judgment dominates. Deliberately conservative multipliers (1.7–3.5×; 2.4× overall).</span></li>
+      <li><span class="t-pt"><b>Escopo:</b> apenas as 11 tasks entregues na semana. Excluídas a task de investigação fechada sem código (808158, no-op) e a ainda em aberto (808160, Strapi).</span><span class="t-en"><b>Scope:</b> only the 11 tasks delivered this week. Excludes the investigation task closed with no code (808158, no-op) and the still-open one (808160, Strapi).</span></li>
+    </ul>
+  </div>
+
+  <footer><span class="t-pt">Fonte: Azure DevOps (projeto Smart Contracts), Sprint 1 · gerado 2026-07-07.</span><span class="t-en">Source: Azure DevOps (Smart Contracts project), Sprint 1 · generated 2026-07-07.</span></footer>
+</div>
+
+<script>
+  // Language switcher (PT/EN) — inline dual-text toggled via [data-lang]; patches attrs CSS can't reach.
+  // Default to English on first visit, then remember the choice (shared key with the sprint report).
+  (function () {
+    var root = document.documentElement;
+    var KEY = 'report-lang';
+    var STR = {
+      en: { htmllang: 'en',    title: 'Gains Analysis — Week 1' },
+      pt: { htmllang: 'pt-BR', title: 'Análise de Ganhos — Semana 1' }
+    };
+    var btns = Array.prototype.slice.call(document.querySelectorAll('.lang'));
+    function setLang(lang) {
+      if (lang !== 'pt' && lang !== 'en') lang = 'en';
+      var s = STR[lang];
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', s.htmllang);
+      document.title = s.title;
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang-set') === lang ? 'true' : 'false'); });
+      try { localStorage.setItem(KEY, lang); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    setLang(saved === 'pt' || saved === 'en' ? saved : 'en');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () { setLang(b.getAttribute('data-lang-set')); });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -122,6 +122,12 @@
   .days .b.zero { background: var(--neutral-soft); }
   .days .n { font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink); }
   .days .lbl { font-size: 10px; color: var(--faint); }
+  .gains-card { background: var(--good-soft); border-color: #cfe6d9; }
+  .gains-card .gval { font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--good); }
+  .gains-card .gval small { font-size: 15px; font-weight: 600; color: var(--muted); }
+  .gains-card .gcap { font-size: 11.5px; color: var(--muted); margin: 7px 0 12px; }
+  .gains-card .glink { font-size: 12.5px; font-weight: 600; font-family: var(--mono); color: var(--accent); text-decoration: none; }
+  .gains-card .glink:hover { text-decoration: underline; }
 
   /* report history / archive nav */
   .reportnav { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); }
@@ -215,6 +221,12 @@
     </main>
 
     <aside class="sidebar" aria-label="Sprint metrics">
+      <div class="card gains-card">
+        <h3><span class="t-pt">Ganhos com IA</span><span class="t-en">AI gains</span></h3>
+        <div class="gval"><span class="t-pt">2,4</span><span class="t-en">2.4</span><small>×</small></div>
+        <p class="gcap"><span class="t-pt">vs. sênior sem IA · 51h economizadas</span><span class="t-en">vs. senior dev without AI · 51h saved</span></p>
+        <a class="glink" href="gains.html"><span class="t-pt">ver análise completa →</span><span class="t-en">view full analysis →</span></a>
+      </div>
       <div class="card">
         <h3><span class="t-pt">Progresso (tasks)</span><span class="t-en">Progress (tasks)</span></h3>
         <div class="ring"><div class="hole"><div><div class="pct">85%</div><div class="sub"><span class="t-pt">concluído</span><span class="t-en">complete</span></div></div></div></div>
