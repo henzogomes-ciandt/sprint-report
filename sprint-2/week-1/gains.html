@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Gains Analysis — Week 1</title>
+<script>try{if(localStorage.getItem('report-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="../../assets/report.css">
 <style>
-  :root {
-    --ground: #f6f7f9; --surface: #ffffff; --ink: #1b2130; --muted: #5a6474; --faint: #8a93a2;
-    --border: #e5e8ee; --accent: #2e5aac; --accent-soft: #eaf0fb;
-    --good: #2f7d5b; --good-soft: #e7f2ec; --warn: #9a6a12; --warn-soft: #f6eede; --warn-bd: #e6d6ad;
-    --neutral: #64707f; --neutral-soft: #eceef1; --hover: #eef2fb;
-    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  }
+  [data-theme="dark"] tbody tr:hover { background: #1e2635; }
+  [data-theme="dark"] tbody tr.norec:hover { background: #33291a; }
+  [data-theme="dark"] .kpi[data-tip]::after { background: #e7ebf3; color: #171f2b; box-shadow: 0 6px 20px rgba(0,0,0,.5); }
+  [data-theme="dark"] .kpi[data-tip]::before { border-top-color: #e7ebf3; }
+
+  /* theme toggle placement (toggle skin + palette live in assets/report.css) */
+  .controls { position: absolute; top: 0; right: 0; display: inline-flex; align-items: center; gap: 12px; }
+  .controls .langsw { position: static; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 72px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 72px; }
 
-  /* language toggle */
   [data-lang="en"] .t-pt { display: none; }
   [data-lang="pt"] .t-en { display: none; }
 
@@ -34,7 +35,7 @@
   .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
   h1 { font-size: clamp(26px, 4.5vw, 36px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance; }
   .daterange { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
-  .lead { color: var(--muted); font-size: 14.5px; margin: 16px 0 0; max-width: 70ch; }
+  .lead { color: var(--muted); font-size: 14.5px; margin: 16px 0 0; max-width: 72ch; }
 
   .langsw { position: absolute; top: 0; right: 0; display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: var(--surface); }
   .langsw .lang { appearance: none; font: inherit; font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); background: transparent; border: 0; padding: 6px 13px; cursor: pointer; transition: background-color .15s ease, color .15s ease; }
@@ -44,41 +45,72 @@
   .langsw .lang:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { .langsw .lang { transition: none; } }
 
-  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 30px 0 8px; }
-  @media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 30px 0 8px; }
+  @media (max-width: 720px) { .kpis { grid-template-columns: 1fr; } }
   .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 16px 18px; }
   .kpi .lbl { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin: 0 0 10px; }
-  .kpi .val { font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-  .kpi .val small { font-size: 15px; font-weight: 600; color: var(--muted); }
-  .kpi.hl { background: var(--good-soft); border-color: #cfe6d9; }
-  .kpi.hl .val { color: var(--good); }
+  .kpi .val { font-family: var(--mono); font-size: 32px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .kpi .val small { font-size: 16px; font-weight: 600; }
+  .kpi .val.gp { color: var(--accent); } .kpi .val.gr { color: var(--good); } .kpi .val.acc { color: var(--acc); }
   .kpi .cap { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
+  .kpi .cap .f { font-family: var(--mono); }
+  .kpi { position: relative; }
+  .kpi[data-tip]::after { content: attr(data-tip); position: absolute; left: 14px; right: 14px; bottom: calc(100% + 9px); background: var(--ink); color: #fff; font-family: var(--sans); font-size: 11.5px; font-weight: 500; line-height: 1.45; text-align: left; padding: 9px 11px; border-radius: 9px; box-shadow: 0 6px 20px rgba(20,30,50,.18); opacity: 0; transform: translateY(3px); pointer-events: none; transition: opacity .14s ease, transform .14s ease; z-index: 10; }
+  .kpi[data-tip]::before { content: ""; position: absolute; left: 26px; bottom: calc(100% + 3px); border: 6px solid transparent; border-top-color: var(--ink); opacity: 0; transition: opacity .14s ease; z-index: 10; }
+  .kpi[data-tip]:hover::after, .kpi[data-tip]:focus-within::after { opacity: 1; transform: translateY(0); }
+  .kpi[data-tip]:hover::before, .kpi[data-tip]:focus-within::before { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .kpi[data-tip]::after { transition: none; } }
+
+  .legend { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin-top: 14px; background: var(--surface); }
+  @media (max-width: 660px) { .legend { grid-template-columns: 1fr; } }
+  .legend .col { padding: 14px 16px 16px; }
+  @media (min-width: 661px) { .legend .col + .col { border-left: 1px solid var(--border); } }
+  @media (max-width: 660px) { .legend .col + .col { border-top: 1px solid var(--border); } }
+  .legend h4 { margin: 0 0 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+  .legend .item { display: flex; gap: 10px; align-items: baseline; font-size: 12.5px; margin: 7px 0; line-height: 1.45; }
+  .legend .term { font-weight: 700; white-space: nowrap; min-width: 92px; }
+  .legend .term.gp { color: var(--accent); } .legend .term.gr { color: var(--good); } .legend .term.acc { color: var(--acc); }
+  .legend .def { color: var(--muted); }
+  .legend .def .f { font-family: var(--mono); font-size: 11px; color: var(--ink); background: var(--neutral-soft); padding: 1px 5px; border-radius: 5px; }
 
   .sec-h { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin: 34px 0 12px; }
 
   .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
-  table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 720px; }
-  thead th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--faint);
-    padding: 12px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  thead th.num, tbody td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 860px; }
+  thead th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--faint);
+    padding: 11px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th.num, tbody td.num, tfoot td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  thead th.grp, tbody td.grp, tfoot td.grp { border-left: 1px solid var(--border); }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
   tbody tr:last-child td { border-bottom: 0; }
   tbody tr:hover { background: #fafbfd; }
+  tbody tr.norec { background: var(--warn-soft); }
+  tbody tr.norec:hover { background: #f3e7cf; }
+  thead th.tip > span, thead th.tip.num { text-decoration: underline dotted 1px var(--faint); text-underline-offset: 3px; }
   td .id { font-family: var(--mono); font-size: 12px; color: var(--faint); }
-  td .task { font-weight: 600; color: var(--ink); }
+  td .task { font-weight: 600; color: var(--ink); font-size: 12.5px; }
   td .cat { display: inline-block; font-size: 10.5px; font-family: var(--mono); color: var(--muted); background: var(--neutral-soft); border-radius: 999px; padding: 2px 8px; margin-top: 5px; }
-  td.gain { color: var(--good); font-weight: 700; }
-  td.mult { color: var(--accent); font-weight: 700; }
-  .cw { color: var(--faint); font-size: 11px; }
-  tfoot td { padding: 13px 14px; border-top: 2px solid var(--border); font-weight: 700; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  td.gp { color: var(--accent); font-weight: 700; }
+  td.gr { color: var(--good); font-weight: 700; }
+  td.acc { color: var(--acc); font-weight: 700; }
+  td.na { color: var(--faint); font-weight: 400; }
+  tfoot td { padding: 12px; border-top: 2px solid var(--border); font-weight: 700; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
   tfoot td.lbl { text-align: left; font-family: var(--sans); letter-spacing: .02em; }
-  tfoot td.gain { color: var(--good); } tfoot td.mult { color: var(--accent); }
+  tfoot td.gp { color: var(--accent); } tfoot td.gr { color: var(--good); } tfoot td.acc { color: var(--acc); }
 
   .notes { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 18px 20px; margin-top: 16px; }
   .notes h3 { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--ink); }
   .notes ul { margin: 0; padding-left: 18px; }
   .notes li { font-size: 12.5px; color: var(--muted); margin: 7px 0; line-height: 1.55; }
   .notes code { font-family: var(--mono); font-size: .9em; background: var(--neutral-soft); color: var(--ink); padding: 1px 5px; border-radius: 5px; }
+  .notes b.gp { color: var(--accent); } .notes b.gr { color: var(--good); } .notes b.acc { color: var(--acc); }
+  details.notes { margin-top: 14px; }
+  details.notes > summary { cursor: pointer; list-style: none; font-size: 13px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  details.notes > summary::-webkit-details-marker { display: none; }
+  details.notes > summary::before { content: "▸"; color: var(--faint); font-size: 11px; }
+  details.notes[open] > summary::before { content: "▾"; }
+  details.notes > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  details.notes ul { margin: 12px 0 0; }
 
   footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--faint); }
 </style>
@@ -100,36 +132,83 @@
       <p class="eyebrow"><span class="t-pt">Análise de ganhos · Sprint 2 · Semana 1</span><span class="t-en">Gains analysis · Sprint 2 · Week 1</span></p>
       <h1><span class="t-pt">Ganhos de produtividade com desenvolvimento agêntico</span><span class="t-en">Productivity gains from agentic development</span></h1>
       <p class="daterange"><span class="t-pt">13 – 17 jul 2026 · 24 tasks entregues</span><span class="t-en">Jul 13 – 17, 2026 · 24 tasks delivered</span></p>
-      <p class="lead"><span class="t-pt">Comparação entre o esforço estimado <b>com IA (agentic)</b> — registrado no ADO ao dimensionar cada task já contando com o agente — e a estimativa de quanto o mesmo trabalho custaria a um <b>desenvolvedor sênior sem IA</b>. A diferença é o ganho de tempo.</span><span class="t-en">Comparison between the estimated effort <b>with AI (agentic)</b> — logged in ADO when sizing each task already assuming the agent — and the estimate of how long the same work would cost a <b>senior developer without AI</b>. The difference is the time saved.</span></p>
+      <p class="lead"><span class="t-pt">Cada task tem três números de tempo; qual par você divide responde uma pergunta diferente. Veja a legenda abaixo.</span><span class="t-en">Every task has three time numbers; which two you divide asks a different question. See the legend below.</span></p>
     </div>
-    <div class="langsw" role="group" aria-label="Language / Idioma">
-      <button type="button" class="lang" data-lang-set="pt" aria-pressed="false">PT</button>
-      <button type="button" class="lang" data-lang-set="en" aria-pressed="true">EN</button>
+    <div class="controls">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark theme" aria-pressed="false" title="Toggle theme">
+        <span class="tt-socket">
+          <svg class="tt-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+              <radialGradient id="ttsun" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#fff6cf"/><stop offset="55%" stop-color="#ffd35a"/><stop offset="100%" stop-color="#f39c1f"/></radialGradient>
+              <radialGradient id="ttmoon" cx="35%" cy="30%" r="80%"><stop offset="0%" stop-color="#f4f7ff"/><stop offset="60%" stop-color="#cfd8ea"/><stop offset="100%" stop-color="#9fabc4"/></radialGradient>
+              <mask id="ttcrescent"><rect x="0" y="0" width="24" height="24" fill="#fff"/><circle cx="17.5" cy="7.5" r="7" fill="#000"/></mask>
+            </defs>
+            <g class="tt-sun">
+              <g class="tt-rays">
+                <line x1="12" y1="1" x2="12" y2="3.6"/><line x1="12" y1="20.4" x2="12" y2="23"/>
+                <line x1="1" y1="12" x2="3.6" y2="12"/><line x1="20.4" y1="12" x2="23" y2="12"/>
+                <line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/>
+                <line x1="19.8" y1="4.2" x2="18" y2="6"/><line x1="6" y1="18" x2="4.2" y2="19.8"/>
+              </g>
+              <circle cx="12" cy="12" r="5.2" fill="url(#ttsun)"/>
+            </g>
+            <g class="tt-moon">
+              <circle cx="12" cy="12" r="6.6" fill="url(#ttmoon)" mask="url(#ttcrescent)"/>
+              <circle class="crater" cx="10" cy="10" r="1.1"/><circle class="crater" cx="8.6" cy="14" r="0.8"/><circle class="crater" cx="12.6" cy="14.4" r="1.4"/>
+            </g>
+          </svg>
+        </span>
+      </button>
+      <div class="langsw" role="group" aria-label="Language / Idioma">
+        <button type="button" class="lang" data-lang-set="pt" aria-pressed="false">PT</button>
+        <button type="button" class="lang" data-lang-set="en" aria-pressed="true">EN</button>
+      </div>
     </div>
   </header>
 
   <div class="kpis">
-    <div class="kpi">
-      <p class="lbl"><span class="t-pt">Estimativa manual</span><span class="t-en">Manual estimate</span></p>
-      <div class="val">192.5<small>h</small></div>
-      <p class="cap"><span class="t-pt">Sênior, sem IA</span><span class="t-en">Senior, no AI</span></p>
+    <div class="kpi" data-tip-pt="No-AI ÷ AI plan — ganho conservador (publicado); não depende do real registrado" data-tip-en="No-AI ÷ AI plan — conservative, published gain; doesn't depend on logged actuals">
+      <p class="lbl"><span class="t-pt">Ganho vs. plano</span><span class="t-en">Gain vs plan</span></p>
+      <div class="val gp"><span class="t-pt">2,5</span><span class="t-en">2.5</span><small>×</small></div>
+      <p class="cap"><span class="f">no-AI ÷ AI plan</span> · <span class="t-pt">conservador (publicado) · 24 tasks</span><span class="t-en">conservative (published) · 24 tasks</span></p>
     </div>
-    <div class="kpi">
-      <p class="lbl"><span class="t-pt">Horas com IA</span><span class="t-en">Hours with AI</span></p>
-      <div class="val">77.5<small>h</small></div>
-      <p class="cap"><span class="t-pt">Estimativa agentic (ADO)</span><span class="t-en">Agentic estimate (ADO)</span></p>
+    <div class="kpi" data-tip-pt="No-AI ÷ AI real — ganho realizado, usando o tempo real registrado" data-tip-en="No-AI ÷ AI real — realized gain, using logged actuals">
+      <p class="lbl"><span class="t-pt">Ganho vs. real</span><span class="t-en">Gain vs real</span></p>
+      <div class="val gr"><span class="t-pt">5,2</span><span class="t-en">5.2</span><small>×</small></div>
+      <p class="cap"><span class="f">no-AI ÷ AI real</span> · <span class="t-pt">realizado · 22 c/ real</span><span class="t-en">realized · 22 w/ actual</span></p>
     </div>
-    <div class="kpi hl">
-      <p class="lbl"><span class="t-pt">Horas economizadas</span><span class="t-en">Hours saved</span></p>
-      <div class="val">115<small>h</small></div>
-      <p class="cap"><span class="t-pt">≈ 2,9 semanas de trabalho</span><span class="t-en">≈ 2.9 work weeks</span></p>
-    </div>
-    <div class="kpi hl">
-      <p class="lbl"><span class="t-pt">Fator de aceleração</span><span class="t-en">Acceleration factor</span></p>
-      <div class="val"><span class="t-pt">2,5</span><span class="t-en">2.5</span><small>×</small></div>
-      <p class="cap"><span class="t-pt">Manual ÷ com IA</span><span class="t-en">Manual ÷ with AI</span></p>
+    <div class="kpi" data-tip-pt="AI plan ÷ AI real — qualidade da estimativa, não é um ganho" data-tip-en="AI plan ÷ AI real — estimate quality, not a gain">
+      <p class="lbl"><span class="t-pt">Precisão da estimativa</span><span class="t-en">Est. accuracy</span></p>
+      <div class="val acc"><span class="t-pt">2,1</span><span class="t-en">2.1</span><small>×</small></div>
+      <p class="cap"><span class="f">AI plan ÷ AI real</span> · <span class="t-pt">não é ganho</span><span class="t-en">not a gain</span></p>
     </div>
   </div>
+
+  <div class="legend">
+    <div class="col">
+      <h4><span class="t-pt">Os três números de tempo</span><span class="t-en">The three time numbers</span></h4>
+      <div class="item"><span class="term">No-AI</span><span class="def"><span class="t-pt">dev sênior, sem IA — o cenário contrafactual</span><span class="t-en">senior dev, no AI — the counterfactual</span></span></div>
+      <div class="item"><span class="term">AI plan</span><span class="def"><span class="t-pt">estimativa agentic — <span class="f">OriginalEstimate</span> do ADO (inclui review)</span><span class="t-en">agentic estimate — ADO <span class="f">OriginalEstimate</span> (incl. review)</span></span></div>
+      <div class="item"><span class="term">AI real</span><span class="def"><span class="t-pt">tempo real registrado — <span class="f">CompletedWork</span> do ADO</span><span class="t-en">logged actual — ADO <span class="f">CompletedWork</span></span></span></div>
+    </div>
+    <div class="col">
+      <h4><span class="t-pt">As três métricas (qual par você divide)</span><span class="t-en">The three metrics (which two you divide)</span></h4>
+      <div class="item"><span class="term gp">Gain vs plan</span><span class="def"><span class="f">No-AI ÷ AI plan</span> — <span class="t-pt">conservador, publicado</span><span class="t-en">conservative, published</span></span></div>
+      <div class="item"><span class="term gr">Gain vs real</span><span class="def"><span class="f">No-AI ÷ AI real</span> — <span class="t-pt">ganho realizado (usa o real)</span><span class="t-en">realized gain (uses the actual)</span></span></div>
+      <div class="item"><span class="term acc">Est. accuracy</span><span class="def"><span class="f">AI plan ÷ AI real</span> — <span class="t-pt">qualidade da estimativa, <b>não</b> um ganho</span><span class="t-en">estimate quality, <b>not</b> a gain</span></span></div>
+    </div>
+  </div>
+
+  <details class="notes">
+    <summary><span class="t-pt">Como ler as três lentes</span><span class="t-en">How to read the three lenses</span></summary>
+    <ul>
+      <li><span class="t-pt"><b class="gp">Ganho vs. plano</b> (No-AI ÷ AI plan) — o número conservador que publicamos (2,5×). Não depende de ninguém registrar o real. É a estimativa <i>planejada</i> do ganho vs. um sênior sem IA.</span><span class="t-en"><b class="gp">Gain vs plan</b> (No-AI ÷ AI plan) — the conservative number we publish (2.5×). Doesn't depend on anyone logging actuals. It's the <i>planned</i> gain vs. a senior without AI.</span></li>
+      <li><span class="t-pt"><b class="gr">Ganho vs. real</b> (No-AI ÷ AI real) — o ganho <i>realizado</i>, usando o tempo real (5,2×). Maior porque o agente superou o plano. Só é confiável na medida em que o <code>CompletedWork</code> é registrado honestamente.</span><span class="t-en"><b class="gr">Gain vs real</b> (No-AI ÷ AI real) — the <i>realized</i> gain, using logged actuals (5.2×). Bigger because the agent beat its plan. Only as trustworthy as the honestly-logged actuals.</span></li>
+      <li><span class="t-pt"><b class="acc">Precisão da estimativa</b> (AI plan ÷ AI real) — <i>não</i> é um ganho: mede o quão perto a estimativa agentic ficou do real. 1,0× = acertou em cheio (todas as tasks de BE); maior = superestimamos. Útil para calibrar planejamento.</span><span class="t-en"><b class="acc">Est. accuracy</b> (AI plan ÷ AI real) — <i>not</i> a gain: how close the agentic estimate was to reality. 1.0× = nailed it (all BE tasks); higher = we over-estimated. Useful to calibrate planning.</span></li>
+      <li><span class="t-pt"><b>Estimativa manual (No-AI)</b> = dev sênior fazendo a task sem IA, ciclo completo (entender → implementar → testar → PR → review). Estimada task a task pelo escopo real entregue, não por fórmula. Multiplicadores deliberadamente conservadores.</span><span class="t-en"><b>Manual estimate (No-AI)</b> = a senior dev doing the task without AI, full cycle (understand → implement → test → PR → review). Estimated task by task from the real scope delivered, not a formula. Deliberately conservative multipliers.</span></li>
+      <li><span class="t-pt"><b>Escopo:</b> as 24 tasks concluídas com estimativa agentic. <b>813832 / 813833</b> ainda não têm <code>CompletedWork</code>, então mostram “—” nas colunas baseadas no real (o Ganho vs. plano ainda calcula). Excluídas: 812739 (DevOps, sem estimativa) e 812808 (seeding de mock, sem o agente).</span><span class="t-en"><b>Scope:</b> the 24 tasks completed with an agentic estimate. <b>813832 / 813833</b> have no <code>CompletedWork</code> yet, so they show “—” on the actual-based columns (Gain vs plan still computes). Excludes: 812739 (DevOps, no estimate) and 812808 (mock seeding, no agent).</span></li>
+    </ul>
+  </details>
 
   <p class="sec-h"><span class="t-pt">Detalhe por task</span><span class="t-en">Per-task detail</span></p>
   <div class="tbl-wrap">
@@ -137,134 +216,130 @@
       <thead>
         <tr>
           <th>Task</th>
-          <th class="num"><span class="t-pt">Manual (sem IA)</span><span class="t-en">Manual (no AI)</span></th>
-          <th class="num"><span class="t-pt">Com IA (ADO)</span><span class="t-en">With AI (ADO)</span></th>
-          <th class="num"><span class="t-pt">Economia</span><span class="t-en">Saved</span></th>
-          <th class="num"><span class="t-pt">Fator</span><span class="t-en">Factor</span></th>
+          <th class="num tip" data-tip-pt="Dev sênior, sem IA — o cenário contrafactual (estimativa humana)" data-tip-en="Senior dev, no AI — the counterfactual (human estimate)">No-AI</th>
+          <th class="num tip" data-tip-pt="Estimativa agentic — OriginalEstimate do ADO, inclui review" data-tip-en="Agentic estimate — ADO OriginalEstimate, includes review">AI plan</th>
+          <th class="num tip" data-tip-pt="Tempo real registrado — CompletedWork do ADO" data-tip-en="Logged actual — ADO CompletedWork">AI real</th>
+          <th class="num grp tip" data-tip-pt="No-AI ÷ AI plan — ganho conservador (publicado)" data-tip-en="No-AI ÷ AI plan — conservative, published gain"><span class="t-pt">Ganho vs. plano</span><span class="t-en">Gain vs plan</span></th>
+          <th class="num tip" data-tip-pt="No-AI ÷ AI real — ganho realizado (usa o real)" data-tip-en="No-AI ÷ AI real — realized gain (uses the actual)"><span class="t-pt">Ganho vs. real</span><span class="t-en">Gain vs real</span></th>
+          <th class="num tip" data-tip-pt="AI plan ÷ AI real — qualidade da estimativa, não é ganho" data-tip-en="AI plan ÷ AI real — estimate quality, not a gain"><span class="t-pt">Precisão</span><span class="t-en">Est. acc.</span></th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><span class="id">812079</span><br><span class="task"><span class="t-pt">Fundação do container (build, tema, i18n, mocks, hooks, routing, DataTable)</span><span class="t-en">Container foundation (build, theme, i18n, mocks, hooks, routing, DataTable)</span></span><br><span class="cat">scaffolding</span></td>
-          <td class="num">14h</td><td class="num">5h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">9h</td><td class="num mult"><span class="t-pt">2,8×</span><span class="t-en">2.8×</span></td>
+          <td class="num">14h</td><td class="num">5h</td><td class="num">2.5h</td><td class="num gp grp"><span class="t-pt">2,8×</span><span class="t-en">2.8×</span></td><td class="num gr"><span class="t-pt">5,6×</span><span class="t-en">5.6×</span></td><td class="num acc"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812081</span><br><span class="task"><span class="t-pt">Portar detalhe do contrato + 7 componentes da Visão geral</span><span class="t-en">Port contract detail + 7 Visão geral components</span></span><br><span class="cat">port</span></td>
-          <td class="num">20h</td><td class="num">8h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">12h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">20h</td><td class="num">8h</td><td class="num">2h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">10,0×</span><span class="t-en">10.0×</span></td><td class="num acc"><span class="t-pt">4,0×</span><span class="t-en">4.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812080</span><br><span class="task"><span class="t-pt">Portar a home</span><span class="t-en">Port the home page</span></span><br><span class="cat">port</span></td>
-          <td class="num">4h</td><td class="num">1.5h <span class="cw"><span class="t-pt">(real 0.5h)</span><span class="t-en">(actual 0.5h)</span></span></td><td class="num gain">2.5h</td><td class="num mult"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td>
+          <td class="num">4h</td><td class="num">1.5h</td><td class="num">0.5h</td><td class="num gp grp"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td><td class="num gr"><span class="t-pt">8,0×</span><span class="t-en">8.0×</span></td><td class="num acc"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812082</span><br><span class="task"><span class="t-pt">Portar a listagem de contratos + ContractsTable</span><span class="t-en">Port the contracts list + ContractsTable</span></span><br><span class="cat">port</span></td>
-          <td class="num">6h</td><td class="num">2.5h <span class="cw"><span class="t-pt">(real 0.5h)</span><span class="t-en">(actual 0.5h)</span></span></td><td class="num gain">3.5h</td><td class="num mult"><span class="t-pt">2,4×</span><span class="t-en">2.4×</span></td>
+          <td class="num">6h</td><td class="num">2.5h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">2,4×</span><span class="t-en">2.4×</span></td><td class="num gr"><span class="t-pt">6,0×</span><span class="t-en">6.0×</span></td><td class="num acc"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
         </tr>
         <tr>
           <td><span class="id">812083</span><br><span class="task"><span class="t-pt">Portar /extracoes + suítes de teste + verificação</span><span class="t-en">Port /extracoes + test suites + verification</span></span><br><span class="cat">port</span></td>
-          <td class="num">8h</td><td class="num">3h <span class="cw"><span class="t-pt">(real 0.5h)</span><span class="t-en">(actual 0.5h)</span></span></td><td class="num gain">5h</td><td class="num mult"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td>
+          <td class="num">8h</td><td class="num">3h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td><td class="num gr"><span class="t-pt">8,0×</span><span class="t-en">8.0×</span></td><td class="num acc"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">813828</span><br><span class="task"><span class="t-pt">Portar /upload (ingestão de contrato)</span><span class="t-en">Port /upload (contract ingestion)</span></span><br><span class="cat">port</span></td>
-          <td class="num">10h</td><td class="num">4h <span class="cw"><span class="t-pt">(real 0.5h)</span><span class="t-en">(actual 0.5h)</span></span></td><td class="num gain">6h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">10h</td><td class="num">4h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">10,0×</span><span class="t-en">10.0×</span></td><td class="num acc"><span class="t-pt">4,0×</span><span class="t-en">4.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">813829</span><br><span class="task"><span class="t-pt">Portar /dev/design-system</span><span class="t-en">Port /dev/design-system</span></span><br><span class="cat">port</span></td>
-          <td class="num">10h</td><td class="num">4h <span class="cw"><span class="t-pt">(real 0.5h)</span><span class="t-en">(actual 0.5h)</span></span></td><td class="num gain">6h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">10h</td><td class="num">4h</td><td class="num">0.5h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">20,0×</span><span class="t-en">20.0×</span></td><td class="num acc"><span class="t-pt">8,0×</span><span class="t-en">8.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">813830</span><br><span class="task"><span class="t-pt">Conectar as telas portadas ao backend real</span><span class="t-en">Wire the ported screens to the real backend</span></span><br><span class="cat"><span class="t-pt">integração</span><span class="t-en">integration</span></span></td>
-          <td class="num">10h</td><td class="num">4h <span class="cw"><span class="t-pt">(real 0.5h)</span><span class="t-en">(actual 0.5h)</span></span></td><td class="num gain">6h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">10h</td><td class="num">4h</td><td class="num">2h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">5,0×</span><span class="t-en">5.0×</span></td><td class="num acc"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812817</span><br><span class="task"><span class="t-pt">Fundação do shell (Vite/React/TS, Chakra v3 + tema, providers, routing)</span><span class="t-en">Shell foundation (Vite/React/TS, Chakra v3 + theme, providers, routing)</span></span><br><span class="cat">scaffolding</span></td>
-          <td class="num">6h</td><td class="num">2h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
+          <td class="num">6h</td><td class="num">2h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td><td class="num gr"><span class="t-pt">6,0×</span><span class="t-en">6.0×</span></td><td class="num acc"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812816</span><br><span class="task"><span class="t-pt">Menu lateral (logo, links, info do usuário) + roteamento</span><span class="t-en">Left nav menu (logo, links, user info) + routing</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">8h</td><td class="num">3h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">5h</td><td class="num mult"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td>
+          <td class="num">8h</td><td class="num">3h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td><td class="num gr"><span class="t-pt">8,0×</span><span class="t-en">8.0×</span></td><td class="num acc"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812814</span><br><span class="task"><span class="t-pt">Componente de cabeçalho (título + avatar com iniciais)</span><span class="t-en">Header component (title + initials avatar)</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">4h</td><td class="num">1.5h <span class="cw"><span class="t-pt">(real 0.5h)</span><span class="t-en">(actual 0.5h)</span></span></td><td class="num gain">2.5h</td><td class="num mult"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td>
+          <td class="num">4h</td><td class="num">1.5h</td><td class="num">0.5h</td><td class="num gp grp"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td><td class="num gr"><span class="t-pt">8,0×</span><span class="t-en">8.0×</span></td><td class="num acc"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812815</span><br><span class="task"><span class="t-pt">i18n + troca de idioma PT/EN</span><span class="t-en">i18n + PT/EN language switch</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">4h</td><td class="num">1.5h</td><td class="num gain">2.5h</td><td class="num mult"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td>
+          <td class="num">4h</td><td class="num">1.5h</td><td class="num">0.5h</td><td class="num gp grp"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td><td class="num gr"><span class="t-pt">8,0×</span><span class="t-en">8.0×</span></td><td class="num acc"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">813663</span><br><span class="task"><span class="t-pt">Recolher/expandir o menu lateral (com persistência)</span><span class="t-en">Collapse/expand the left menu (with persistence)</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">5h</td><td class="num">2h <span class="cw"><span class="t-pt">(real 0.75h)</span><span class="t-en">(actual 0.75h)</span></span></td><td class="num gain">3h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">5h</td><td class="num">2h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">5,0×</span><span class="t-en">5.0×</span></td><td class="num acc"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812740</span><br><span class="task"><span class="t-pt">Módulos — view-model, mock & i18n</span><span class="t-en">Modules — view-model, mock & i18n</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">2.5h</td><td class="num">1h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">1.5h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">2.5h</td><td class="num">1h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num acc"><span class="t-pt">1,0×</span><span class="t-en">1.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812741</span><br><span class="task"><span class="t-pt">Componente ModuleCard</span><span class="t-en">ModuleCard component</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">7h</td><td class="num">3h <span class="cw"><span class="t-pt">(real 1h)</span><span class="t-en">(actual 1h)</span></span></td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">2,3×</span><span class="t-en">2.3×</span></td>
+          <td class="num">7h</td><td class="num">3h</td><td class="num">1h</td><td class="num gp grp"><span class="t-pt">2,3×</span><span class="t-en">2.3×</span></td><td class="num gr"><span class="t-pt">7,0×</span><span class="t-en">7.0×</span></td><td class="num acc"><span class="t-pt">3,0×</span><span class="t-en">3.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812742</span><br><span class="task"><span class="t-pt">Sub-aba Estrutura operacional + grid de Módulos + integração</span><span class="t-en">Operational-structure sub-tab + Modules grid + integration</span></span><br><span class="cat"><span class="t-pt">integração</span><span class="t-en">integration</span></span></td>
-          <td class="num">8h</td><td class="num">3h <span class="cw"><span class="t-pt">(real 2h)</span><span class="t-en">(actual 2h)</span></span></td><td class="num gain">5h</td><td class="num mult"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td>
+          <td class="num">8h</td><td class="num">3h</td><td class="num">2h</td><td class="num gp grp"><span class="t-pt">2,7×</span><span class="t-en">2.7×</span></td><td class="num gr"><span class="t-pt">4,0×</span><span class="t-en">4.0×</span></td><td class="num acc"><span class="t-pt">1,5×</span><span class="t-en">1.5×</span></td>
         </tr>
         <tr>
           <td><span class="id">812841</span><br><span class="task"><span class="t-pt">[BE] Endpoint de operational-modules do contrato</span><span class="t-en">[BE] Contract operational-modules endpoint</span></span><br><span class="cat">backend</span></td>
-          <td class="num">6h</td><td class="num">3h</td><td class="num gain">3h</td><td class="num mult"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
+          <td class="num">6h</td><td class="num">3h</td><td class="num">3h</td><td class="num gp grp"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td><td class="num gr"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td><td class="num acc"><span class="t-pt">1,0×</span><span class="t-en">1.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">813733</span><br><span class="task"><span class="t-pt">Fila de validação — camada de dados, mock & i18n</span><span class="t-en">Validation queue — data layer, mock & i18n</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">10h</td><td class="num">4h <span class="cw"><span class="t-pt">(real 2h)</span><span class="t-en">(actual 2h)</span></span></td><td class="num gain">6h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">10h</td><td class="num">4h</td><td class="num">2h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">5,0×</span><span class="t-en">5.0×</span></td><td class="num acc"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">813734</span><br><span class="task"><span class="t-pt">Fila de validação — view e página (US-6.1)</span><span class="t-en">Validation queue — view & page (US-6.1)</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">10h</td><td class="num">4h <span class="cw"><span class="t-pt">(real 2h)</span><span class="t-en">(actual 2h)</span></span></td><td class="num gain">6h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">10h</td><td class="num">4h</td><td class="num">2h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">5,0×</span><span class="t-en">5.0×</span></td><td class="num acc"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
         </tr>
-        <tr>
+        <tr class="norec">
           <td><span class="id">813832</span><br><span class="task"><span class="t-pt">Status de validação — modelo, mapeamento, mock & i18n</span><span class="t-en">Validation status — model, mapping, mock & i18n</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">6h</td><td class="num">2.5h</td><td class="num gain">3.5h</td><td class="num mult"><span class="t-pt">2,4×</span><span class="t-en">2.4×</span></td>
+          <td class="num">6h</td><td class="num">2.5h</td><td class="num na">—</td><td class="num gp grp"><span class="t-pt">2,4×</span><span class="t-en">2.4×</span></td><td class="num na">—</td><td class="num na">—</td>
         </tr>
-        <tr>
+        <tr class="norec">
           <td><span class="id">813833</span><br><span class="task"><span class="t-pt">Coluna e badge de status na fila</span><span class="t-en">Status column & badge in the queue</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">5h</td><td class="num">2h</td><td class="num gain">3h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">5h</td><td class="num">2h</td><td class="num na">—</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num na">—</td><td class="num na">—</td>
         </tr>
         <tr>
           <td><span class="id">814360</span><br><span class="task"><span class="t-pt">Filtrar, priorizar e ordenar a fila (views + mock)</span><span class="t-en">Filter, prioritize & sort the queue (views + mock)</span></span><br><span class="cat"><span class="t-pt">feature</span><span class="t-en">feature</span></span></td>
-          <td class="num">15h</td><td class="num">6h <span class="cw"><span class="t-pt">(real 2.5h)</span><span class="t-en">(actual 2.5h)</span></span></td><td class="num gain">9h</td><td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">15h</td><td class="num">6h</td><td class="num">2.5h</td><td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td><td class="num gr"><span class="t-pt">6,0×</span><span class="t-en">6.0×</span></td><td class="num acc"><span class="t-pt">2,4×</span><span class="t-en">2.4×</span></td>
         </tr>
         <tr>
           <td><span class="id">812726</span><br><span class="task"><span class="t-pt">[BE] Rotas de API da fila de validação</span><span class="t-en">[BE] Validation-queue API routes</span></span><br><span class="cat">backend</span></td>
-          <td class="num">8h</td><td class="num">4h</td><td class="num gain">4h</td><td class="num mult"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
+          <td class="num">8h</td><td class="num">4h</td><td class="num">4h</td><td class="num gp grp"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td><td class="num gr"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td><td class="num acc"><span class="t-pt">1,0×</span><span class="t-en">1.0×</span></td>
         </tr>
         <tr>
           <td><span class="id">812728</span><br><span class="task"><span class="t-pt">[BE] Rotas de filtro e ordenação da fila</span><span class="t-en">[BE] Filter & sort validation-queue routes</span></span><br><span class="cat">backend</span></td>
-          <td class="num">6h</td><td class="num">3h</td><td class="num gain">3h</td><td class="num mult"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td>
+          <td class="num">6h</td><td class="num">3h</td><td class="num">3h</td><td class="num gp grp"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td><td class="num gr"><span class="t-pt">2,0×</span><span class="t-en">2.0×</span></td><td class="num acc"><span class="t-pt">1,0×</span><span class="t-en">1.0×</span></td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <td class="lbl"><span class="t-pt">Total — 24 tasks entregues</span><span class="t-en">Total — 24 tasks delivered</span></td>
+          <td class="lbl"><span class="t-pt">Total — 24 tasks (22 c/ real)</span><span class="t-en">Total — 24 tasks (22 w/ actual)</span></td>
           <td class="num">192.5h</td>
           <td class="num">77.5h</td>
-          <td class="num gain">115h</td>
-          <td class="num mult"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num">35h</td>
+          <td class="num gp grp"><span class="t-pt">2,5×</span><span class="t-en">2.5×</span></td>
+          <td class="num gr"><span class="t-pt">5,2×</span><span class="t-en">5.2×</span></td>
+          <td class="num acc"><span class="t-pt">2,1×</span><span class="t-en">2.1×</span></td>
         </tr>
       </tfoot>
     </table>
   </div>
 
-  <div class="notes">
-    <h3><span class="t-pt">Metodologia e premissas</span><span class="t-en">Methodology &amp; assumptions</span></h3>
-    <ul>
-      <li><span class="t-pt"><b>Horas com IA</b> = <code>OriginalEstimate</code> do ADO — dimensionado já contando com o agente. É o campo preenchido de forma consistente; onde há <code>CompletedWork</code> (real), o valor foi <i>menor</i> que a estimativa (o agente superou a própria estimativa), então o ganho aqui está <b>subestimado</b>, não inflado.</span><span class="t-en"><b>Hours with AI</b> = ADO <code>OriginalEstimate</code> — sized already assuming the agent. It's the consistently-filled field; where <code>CompletedWork</code> (actual) exists it was <i>lower</i> than the estimate (the agent beat its own estimate), so the gain here is <b>understated</b>, not inflated.</span></li>
-      <li><span class="t-pt"><b>Estimativa manual (sem IA)</b> = tempo de um desenvolvedor sênior fazendo a task sem IA, ciclo completo (entender o requisito e o código → implementar → testar → abrir PR → ciclos de review). Estimada task a task a partir do escopo real do que foi entregue, não de uma fórmula. O agente comprime justamente os custos fixos humanos (leitura de código, boilerplate, testes, iterações de review); por isso o multiplicador é maior em tasks de scaffolding/porte e menor onde a lógica/decisão de design domina. Multiplicadores deliberadamente conservadores (2,0–3,0×; 2,5× no total).</span><span class="t-en"><b>Manual estimate (no AI)</b> = a senior developer doing the task without AI, full cycle (understand the requirement and the code → implement → test → open the PR → review iterations). Estimated task by task from the actual scope of what was delivered, not from a formula. The agent compresses exactly the fixed human costs (reading code, boilerplate, tests, review iterations); that's why the multiplier is higher on scaffolding/port tasks and lower where logic/design judgment dominates. Deliberately conservative multipliers (2.0–3.0×; 2.5× overall).</span></li>
-      <li><span class="t-pt"><b>Escopo:</b> apenas as 24 tasks concluídas na semana, com estimativa agentic. Excluídas as tasks ainda abertas/em review, a criação do repositório (812739, DevOps, sem estimativa) e o seeding de dados de mock (812808, enabler feito sem o agente).</span><span class="t-en"><b>Scope:</b> only the 24 tasks completed this week that carry an agentic estimate. Excludes still-open/in-review tasks, the repository creation (812739, DevOps, no estimate) and the mock-data seeding (812808, an enabler done without the agent).</span></li>
-    </ul>
-  </div>
-
   <footer><span class="t-pt">Fonte: Azure DevOps (projeto Smart Contracts), Sprint 2 · gerado 2026-07-20.</span><span class="t-en">Source: Azure DevOps (Smart Contracts project), Sprint 2 · generated 2026-07-20.</span></footer>
 </div>
 
+<script src="../../assets/report.js"></script>
 <script>
   // Language switcher (PT/EN) — inline dual-text toggled via [data-lang]; patches attrs CSS can't reach.
   (function () {
@@ -281,6 +356,10 @@
       root.setAttribute('data-lang', lang);
       root.setAttribute('lang', s.htmllang);
       document.title = s.title;
+      document.querySelectorAll('[data-tip-en]').forEach(function (el) {
+        var v = el.getAttribute('data-tip-' + lang) || '';
+        if (el.classList.contains('kpi')) { el.setAttribute('data-tip', v); } else { el.title = v; }
+      });
       btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang-set') === lang ? 'true' : 'false'); });
       try { localStorage.setItem(KEY, lang); } catch (e) {}
     }

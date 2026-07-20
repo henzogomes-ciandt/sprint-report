@@ -1,0 +1,65 @@
+/* ===========================================================================
+   Smart Contracts sprint reports — shared theme layer
+   Loaded by every page BEFORE its own inline <style>. Owns: the color palette
+   (light + dark), color-scheme, the skeuomorphic sun/moon theme toggle, and the
+   smooth cross-fade when switching modes. Page-specific layout and dark
+   overrides (e.g. .controls positioning, row-hover colors) stay inline.
+   The palette is a UNION of every page's variables; unused names are harmless.
+   =========================================================================== */
+
+:root {
+  --ground: #f6f7f9; --surface: #ffffff; --ink: #1b2130; --muted: #5a6474; --faint: #8a93a2;
+  --border: #e5e8ee; --accent: #2e5aac; --accent-soft: #eaf0fb;
+  --good: #2f7d5b; --good-soft: #e7f2ec;
+  --wait: #9a6a12; --wait-soft: #f6eede;
+  --warn: #9a6a12; --warn-soft: #f6eede; --warn-bd: #e6d6ad;
+  --prog: #4b57a6; --prog-soft: #ecedf8;
+  --acc: #7a4bab; --acc-soft: #efe9f7;
+  --neutral: #64707f; --neutral-soft: #eceef1; --hover: #eef2fb;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+[data-theme="dark"] {
+  --ground: #10141d; --surface: #191f2b; --ink: #e7ebf3; --muted: #9aa5b8; --faint: #6a7688;
+  --border: #2a3242; --accent: #7d9be6; --accent-soft: #1f2a44;
+  --good: #57c08e; --good-soft: #14271e;
+  --wait: #d6a94e; --wait-soft: #2c2413;
+  --warn: #d6a94e; --warn-soft: #2c2413; --warn-bd: #43371c;
+  --prog: #8f9ae0; --prog-soft: #22283f;
+  --acc: #b98fe0; --acc-soft: #2a2140;
+  --neutral: #8892a3; --neutral-soft: #232b3a; --hover: #1b2333;
+}
+html { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+
+/* smooth cross-fade on theme switch — low specificity, so any element with its
+   own transition (hover states, the toggle icon) keeps it. No transition fires
+   on load: the FOUC head script sets the theme before first paint. */
+*, *::before, *::after {
+  transition: background-color .38s ease, border-color .38s ease, color .38s ease, fill .38s ease, box-shadow .38s ease;
+}
+
+/* ── theme toggle — recessed skeuomorphic sun/moon ── */
+.theme-toggle { appearance: none; border: 0; background: transparent; padding: 0; margin: 0; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; flex-shrink: 0; }
+.tt-socket { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ground);
+  box-shadow: inset 2px 3px 6px rgba(10,20,40,.28), inset -2px -3px 6px rgba(255,255,255,.75); transition: box-shadow .3s ease; }
+[data-theme="dark"] .tt-socket { background: radial-gradient(circle at 50% 42%, #2b3444, #1a212f); box-shadow: inset 2px 3px 6px rgba(0,0,0,.5), inset -2px -3px 6px rgba(255,255,255,.09); }
+.theme-toggle:hover .tt-socket { box-shadow: inset 1px 2px 5px rgba(10,20,40,.32), inset -1px -2px 5px rgba(255,255,255,.82); }
+[data-theme="dark"] .theme-toggle:hover .tt-socket { background: radial-gradient(circle at 50% 42%, #333d50, #1e2534); box-shadow: inset 1px 2px 5px rgba(0,0,0,.55), inset -1px -2px 5px rgba(255,255,255,.12); }
+.theme-toggle:active .tt-socket { box-shadow: inset 3px 4px 7px rgba(10,20,40,.34), inset -1px -1px 3px rgba(255,255,255,.6); }
+.theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tt-icon { width: 23px; height: 23px; overflow: visible; display: block; }
+.tt-icon > g { transform-origin: 12px 12px; transition: transform .55s cubic-bezier(.5,1.7,.5,1), opacity .35s ease; }
+.tt-sun { filter: drop-shadow(0 1px 1.5px rgba(210,120,20,.55)); }
+.tt-moon { filter: drop-shadow(0 0 3px rgba(196,212,244,.6)) drop-shadow(0 0 6px rgba(150,170,215,.32)); }
+.tt-rays line { stroke: #f4a52a; stroke-width: 2; stroke-linecap: round; }
+.tt-moon .crater { fill: #8f9bb3; opacity: .5; }
+.tt-moon { opacity: 0; transform: scale(.4) rotate(-80deg); }
+.tt-sun  { opacity: 1; transform: scale(1) rotate(0deg); }
+[data-theme="dark"] .tt-sun  { opacity: 0; transform: scale(.4) rotate(80deg); }
+[data-theme="dark"] .tt-moon { opacity: 1; transform: scale(1) rotate(0deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none; }
+  .tt-icon > g { transition: opacity .2s ease; }
+}
