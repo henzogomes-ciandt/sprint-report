@@ -1,0 +1,447 @@
+<!doctype html>
+<!-- judgment sprint-2 week-1: noop=[]; resolved-as-done=[812739]; blocked-as-active=[814361]; gains-exclude=[812808(enabler/mock-data),812739(no-estimate/devops)]; chip-defaults=state-derived; weekend-rule=812461 tasks (815740-745) built Sat-Sun Jul18-19 → counted in week 1 per Fri-attribution rule; manual-hrs={812079:14,812080:4,812081:20,812082:6,812083:8,813828:10,813829:10,813830:10,812814:4,812815:4,812816:8,812817:6,813663:5,812740:2.5,812741:7,812742:8,812841:6,813733:10,813734:10,813832:6,813833:5,814360:15,812726:8,812728:6} -->
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Sprint Report — Week 1 (Jul 13 – 17, 2026)">
+<title>Sprint Report — Week 1</title>
+<style>
+  :root {
+    --ground: #f6f7f9; --surface: #ffffff; --ink: #1b2130; --muted: #5a6474; --faint: #8a93a2;
+    --border: #e5e8ee; --accent: #2e5aac; --accent-soft: #eaf0fb;
+    --good: #2f7d5b; --good-soft: #e7f2ec; --wait: #9a6a12; --wait-soft: #f6eede;
+    --prog: #4b57a6; --prog-soft: #ecedf8; --neutral: #64707f; --neutral-soft: #eceef1;
+    --hover: #eef2fb;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 52px 24px 72px; }
+
+  /* language toggle */
+  [data-lang="en"] .t-pt { display: none; }
+  [data-lang="pt"] .t-en { display: none; }
+
+  /* breadcrumb + in-sprint switcher */
+  .crumbs { font-family: var(--mono); font-size: 12px; color: var(--faint); margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .crumbs a { color: var(--accent); text-decoration: none; }
+  .crumbs a:hover { text-decoration: underline; }
+  .crumbs .cur { color: var(--muted); }
+  .switch { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: var(--surface); margin-bottom: 24px; flex-wrap: wrap; }
+  .switch .seg { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--muted); text-decoration: none; padding: 7px 15px; transition: background-color .15s ease, color .15s ease; }
+  .switch .seg + .seg { border-left: 1px solid var(--border); }
+  .switch .seg:hover:not(.active):not(.soon) { background: var(--hover); }
+  .switch .seg.active { background: var(--accent); color: #fff; }
+  .switch .seg.soon { color: var(--faint); cursor: default; }
+  .switch .seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px 20px; flex-wrap: wrap; }
+  .hd-main { min-width: 0; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+  h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance; }
+  .daterange { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+
+  .langsw { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: var(--surface); flex-shrink: 0; }
+  .langsw .lang { appearance: none; font: inherit; font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); background: transparent; border: 0; padding: 6px 13px; cursor: pointer; transition: background-color .15s ease, color .15s ease; }
+  .langsw .lang + .lang { border-left: 1px solid var(--border); }
+  .langsw .lang[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .langsw .lang:hover:not([aria-pressed="true"]) { background: var(--hover); }
+  .langsw .lang:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1fr) 268px; gap: 28px; align-items: start; margin-top: 30px; }
+  @media (max-width: 740px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static !important; order: -1; } }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .fchip { appearance: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 999px; padding: 6px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+  .fchip .ct { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--neutral-soft); color: var(--muted); }
+  .fchip:hover { background: var(--hover); }
+  .fchip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .fchip[aria-pressed="true"] .ct { background: rgba(255,255,255,.25); color: #fff; }
+  .fchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .groups { display: flex; flex-direction: column; gap: 14px; }
+  details.sg { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; background: var(--surface); }
+  details.sg[hidden] { display: none; }
+  details.sg > summary.sg-head { list-style: none; cursor: pointer; padding: 15px 16px; user-select: none; transition: background-color .15s ease; }
+  details.sg > summary.sg-head::-webkit-details-marker { display: none; }
+  details.sg > summary.sg-head:hover { background: var(--hover); }
+  details.sg > summary.sg-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 13px; }
+  .sg-head .top { display: flex; align-items: center; gap: 10px; }
+  .sg-head .id { font-family: var(--mono); font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; min-width: 52px; }
+  .sg-head .title { font-size: 15px; font-weight: 700; flex: 1; min-width: 0; letter-spacing: -0.01em; }
+  .sg-head .chev { color: var(--faint); font-size: 18px; line-height: 1; transition: transform .18s ease; flex-shrink: 0; }
+  details.sg[open] > summary.sg-head .chev { transform: rotate(90deg); }
+  .sg-head .s-prog { display: flex; align-items: center; gap: 12px; margin-top: 11px; }
+  .sg-head .s-bar { flex: 1; height: 6px; background: var(--neutral-soft); border-radius: 999px; overflow: hidden; }
+  .sg-head .s-bar > i { display: block; height: 100%; background: var(--good); border-radius: 999px; }
+  .sg-head .s-frac { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sg.na .s-frac { color: var(--faint); }
+  .sg-tasks { background: var(--ground); border-top: 1px solid var(--border); padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+  .sg-empty { background: var(--ground); border-top: 1px solid var(--border); padding: 13px 16px; color: var(--faint); font-size: 12.5px; }
+  @media (prefers-reduced-motion: reduce) { .sg-head .chev, details.sg > summary.sg-head { transition: none; } }
+
+  details.tk { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  details.tk[hidden] { display: none; }
+  details.tk > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 14px; padding: 11px 14px; user-select: none; transition: background-color .15s ease; }
+  details.tk > summary::-webkit-details-marker { display: none; }
+  details.tk > summary:hover { background: var(--hover); }
+  details.tk > summary:hover .chev { color: var(--accent); }
+  details.tk:hover { border-color: #d3dae8; }
+  details.tk > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+  details.tk[open] > summary { border-bottom: 1px solid var(--border); }
+  summary .id { font-family: var(--mono); font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; min-width: 52px; }
+  summary .t { font-size: 13.5px; flex: 1; min-width: 0; }
+  summary .chev { color: var(--faint); font-size: 18px; line-height: 1; transition: transform .18s ease; flex-shrink: 0; }
+  details.tk[open] > summary .chev { transform: rotate(90deg); }
+  @media (prefers-reduced-motion: reduce) { summary .chev, details.tk > summary, .fchip, .langsw .lang { transition: none; } }
+  .tk .desc { padding: 12px 14px 15px 66px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .tk .desc code { font-family: var(--mono); font-size: .9em; background: var(--neutral-soft); color: var(--ink); padding: 1px 5px; border-radius: 5px; }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; font-family: var(--mono); letter-spacing: .01em; white-space: nowrap; flex-shrink: 0; }
+  .chip.done { background: var(--good-soft); color: var(--good); }
+  .chip.open { background: var(--wait-soft); color: var(--wait); }
+  .chip.noop { background: var(--neutral-soft); color: var(--neutral); }
+  .chip.active { background: var(--accent-soft); color: var(--accent); }
+  .chip.review { background: var(--prog-soft); color: var(--prog); }
+  .chip.ready { background: var(--wait-soft); color: var(--wait); }
+
+  .empty-all { color: var(--faint); font-size: 13.5px; padding: 20px 4px; display: none; }
+
+  .sidebar { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 16px 18px; }
+  .card h3 { margin: 0 0 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+  .ring { width: 116px; height: 116px; border-radius: 50%; margin: 0 auto 4px; background: conic-gradient(var(--good) 0 67%, var(--neutral-soft) 0 100%); display: grid; place-items: center; }
+  .ring .hole { width: 82px; height: 82px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; text-align: center; }
+  .ring .pct { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .ring .sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .ring-cap { text-align: center; font-size: 12px; color: var(--muted); }
+  .ring-cap b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stack { display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin-bottom: 12px; }
+  .stack > i { display: block; }
+  .stack .s-done { background: var(--good); } .stack .s-open { background: var(--wait); } .stack .s-noop { background: var(--neutral); }
+  .stack .s-active { background: var(--accent); } .stack .s-review { background: var(--prog); }
+  .legend { display: flex; flex-direction: column; gap: 7px; }
+  .legend .row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+  .legend .dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+  .legend .row b { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+  .dot.done { background: var(--good); } .dot.open { background: var(--wait); } .dot.noop { background: var(--neutral); }
+  .dot.active { background: var(--accent); } .dot.review { background: var(--prog); }
+  .bar { height: 8px; border-radius: 999px; background: var(--neutral-soft); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--good); border-radius: 999px; }
+  .days { display: flex; align-items: flex-end; gap: 7px; height: 84px; margin-top: 4px; }
+  .days .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; }
+  .days .b { width: 100%; max-width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 3px; }
+  .days .b.zero { background: var(--neutral-soft); }
+  .days .n { font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .days .lbl { font-size: 10px; color: var(--faint); }
+  .gains-card { background: var(--good-soft); border-color: #cfe6d9; }
+  .gains-card .gval { font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--good); }
+  .gains-card .gval small { font-size: 15px; font-weight: 600; color: var(--muted); }
+  .gains-card .gcap { font-size: 11.5px; color: var(--muted); margin: 7px 0 12px; }
+  .gains-card .glink { font-size: 12.5px; font-weight: 600; font-family: var(--mono); color: var(--accent); text-decoration: none; }
+  .gains-card .glink:hover { text-decoration: underline; }
+
+  .foot-note { margin-top: 18px; font-size: 11.5px; color: var(--faint); line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../../index.html"><span class="t-pt">Início</span><span class="t-en">Home</span></a>
+    <span>/</span>
+    <a href="../index.html">Sprint 2</a>
+    <span>/</span>
+    <span class="cur"><span class="t-pt">Semana 1</span><span class="t-en">Week 1</span></span>
+  </nav>
+  <div class="switch" role="group" aria-label="Sprint 2 reports">
+    <a class="seg active" aria-current="page" href="index.html"><span class="t-pt">Semana 1</span><span class="t-en">Week 1</span></a>
+    <span class="seg soon" title="Coming soon"><span class="t-pt">Semana 2</span><span class="t-en">Week 2</span></span>
+    <span class="seg soon" title="Coming soon"><span class="t-pt">Sprint completa</span><span class="t-en">Full sprint</span></span>
+  </div>
+
+  <header>
+    <div class="hd-main">
+      <p class="eyebrow">Sprint 2</p>
+      <h1>Sprint Report — <span class="t-pt">Semana 1</span><span class="t-en">Week 1</span></h1>
+      <p class="daterange"><span class="t-pt">13 – 17 jul 2026</span><span class="t-en">Jul 13 – 17, 2026</span></p>
+    </div>
+    <div class="langsw" role="group" aria-label="Language / Idioma">
+      <button type="button" class="lang" data-lang-set="pt" aria-pressed="false">PT</button>
+      <button type="button" class="lang" data-lang-set="en" aria-pressed="true">EN</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <div class="filters" role="group" aria-label="Filter tasks by status">
+        <button class="fchip" data-filter="all" aria-pressed="true"><span class="t-pt">Todos</span><span class="t-en">All</span> <span class="ct">39</span></button>
+        <button class="fchip" data-filter="done" aria-pressed="false"><span class="t-pt">Concluídos</span><span class="t-en">Completed</span> <span class="ct">26</span></button>
+        <button class="fchip" data-filter="review" aria-pressed="false"><span class="t-pt">Em review</span><span class="t-en">In review</span> <span class="ct">8</span></button>
+        <button class="fchip" data-filter="active" aria-pressed="false"><span class="t-pt">Em andamento</span><span class="t-en">In progress</span> <span class="ct">3</span></button>
+        <button class="fchip" data-filter="open" aria-pressed="false"><span class="t-pt">Em aberto</span><span class="t-en">Open</span> <span class="ct">2</span></button>
+      </div>
+
+      <div class="groups">
+
+        <!-- 810983 — Migrate MFE → SC Container (parity) -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">810983</span><span class="title"><span class="t-pt">Migração das telas/componentes/rotas do MFE para o SC Container (paridade)</span><span class="t-en">Migrate the SC MFE screens/components/routes into the SC Container (parity)</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:100%"></i></div><span class="s-frac">8/8 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812079</span><span class="t"><span class="t-pt">Fundação do container</span><span class="t-en">Container foundation</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Portou a base do SC Container: configuração de build, tema, i18n, camada de mocks, hooks, roteamento e <code>ui/DataTable</code>.</span><span class="t-en">Ported the SC Container foundation: build config, theme, i18n, mock layer, hooks, routing and <code>ui/DataTable</code>.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812080</span><span class="t"><span class="t-pt">Portar a home</span><span class="t-en">Port the home page</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Portou a página inicial para o SC Container.</span><span class="t-en">Ported the home page into the SC Container.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812081</span><span class="t"><span class="t-pt">Portar detalhe do contrato + 7 componentes</span><span class="t-en">Port contract detail + 7 components</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Portou a tela de detalhe do contrato (<code>/contracts/:id</code>) e os 7 componentes da Visão geral, com re-verificação de fidelidade visual.</span><span class="t-en">Ported the contract-detail screen (<code>/contracts/:id</code>) and the 7 Visão geral components, with a visual-fidelity re-check.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812082</span><span class="t"><span class="t-pt">Portar a listagem de contratos</span><span class="t-en">Port the contracts list</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Portou a listagem de contratos (<code>/contracts</code>) e a <code>ContractsTable</code>.</span><span class="t-en">Ported the contracts list (<code>/contracts</code>) and the <code>ContractsTable</code>.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812083</span><span class="t"><span class="t-pt">Portar /extracoes + testes</span><span class="t-en">Port /extracoes + tests</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Portou a tela <code>/extracoes</code>, as suítes de teste e rodou verificação completa (build verde + browser).</span><span class="t-en">Ported the <code>/extracoes</code> screen, the test suites and ran full verification (green build + browser).</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">813828</span><span class="t"><span class="t-pt">Portar /upload (ingestão de contrato)</span><span class="t-en">Port /upload (contract ingestion)</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Portou a tela de ingestão de contrato (<code>/upload</code>) para o SC Container.</span><span class="t-en">Ported the contract-ingestion screen (<code>/upload</code>) into the SC Container.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">813829</span><span class="t"><span class="t-pt">Portar /dev/design-system</span><span class="t-en">Port /dev/design-system</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Portou a página de showcase de componentes (<code>/dev/design-system</code>) para o SC Container.</span><span class="t-en">Ported the component showcase page (<code>/dev/design-system</code>) into the SC Container.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">813830</span><span class="t"><span class="t-pt">Conectar telas portadas ao backend real</span><span class="t-en">Wire ported screens to real backend</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Conectou as telas portadas ao backend real (sem auth), fechando a paridade funcional do container.</span><span class="t-en">Wired the ported screens to the real backend (no auth), closing the container's functional parity.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 812451 — Navigate from the left menu -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">812451</span><span class="title"><span class="t-pt">Navegar pela plataforma a partir do menu lateral</span><span class="t-en">Navigate the platform from the left menu</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:100%"></i></div><span class="s-frac">2/2 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812817</span><span class="t"><span class="t-pt">Fundação do shell (bootstrap)</span><span class="t-en">Shell foundation (bootstrap)</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Bootstrap do SC Container: Vite/React/TS, Chakra v3 + tema, providers e esqueleto de roteamento.</span><span class="t-en">SC Container bootstrap: Vite/React/TS, Chakra v3 + theme, providers and routing skeleton.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812816</span><span class="t"><span class="t-pt">Menu lateral + roteamento</span><span class="t-en">Left nav menu + routing</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Menu lateral de navegação (logo, links de seção, info do usuário) integrado ao roteamento.</span><span class="t-en">Left navigation menu (logo, section links, user info) wired to routing.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 812449 — App header -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">812449</span><span class="title"><span class="t-pt">Exibir o cabeçalho do app com título e usuário logado</span><span class="t-en">Display the app header with title and signed-in user</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:100%"></i></div><span class="s-frac">1/1 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812814</span><span class="t"><span class="t-pt">Componente de cabeçalho</span><span class="t-en">Header component</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Componente de cabeçalho do app (título + avatar com iniciais do usuário).</span><span class="t-en">App header component (title + user-initials avatar).</span></div></details>
+          </div>
+        </details>
+
+        <!-- 812450 — PT/EN switch -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">812450</span><span class="title"><span class="t-pt">Alternar o idioma da interface entre PT e EN</span><span class="t-en">Switch the interface language between PT and EN</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:100%"></i></div><span class="s-frac">1/1 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812815</span><span class="t"><span class="t-pt">i18n + troca de idioma PT/EN</span><span class="t-en">i18n + PT/EN language switch</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Configuração de i18n e chave de troca de idioma PT/EN no SC Container.</span><span class="t-en">i18n setup and a PT/EN language switch in the SC Container.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 812453 — Collapse/expand menu -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">812453</span><span class="title"><span class="t-pt">Recolher e expandir o menu lateral</span><span class="t-en">Collapse and expand the left menu</span></span><span class="chip ready"><span class="t-pt">pronta p/ review</span><span class="t-en">ready for review</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:100%"></i></div><span class="s-frac">1/1 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">813663</span><span class="t"><span class="t-pt">Recolher/expandir o menu</span><span class="t-en">Collapse/expand the menu</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Recolher/expandir o menu lateral no SC Container, com persistência do estado.</span><span class="t-en">Collapse/expand the left menu in the SC Container, persisting the state.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 807103 — US-5.5 Operational structure · Modules -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">807103</span><span class="title">US-5.5 · <span class="t-pt">Estrutura operacional · Módulos</span><span class="t-en">Operational structure · Modules</span></span><span class="chip active"><span class="t-pt">ativa</span><span class="t-en">active</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:80%"></i></div><span class="s-frac">4/5 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812740</span><span class="t"><span class="t-pt">Módulos — view-model, mock & i18n</span><span class="t-en">Modules — view-model, mock & i18n</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">View-model, fixture de mock e i18n da aba Módulos.</span><span class="t-en">View-model, mock fixture and i18n for the Módulos tab.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812741</span><span class="t"><span class="t-pt">Componente ModuleCard</span><span class="t-en">ModuleCard component</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Componente <code>ModuleCard</code> da aba Módulos.</span><span class="t-en"><code>ModuleCard</code> component for the Módulos tab.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812742</span><span class="t"><span class="t-pt">Sub-aba Estrutura operacional + grid</span><span class="t-en">Operational-structure sub-tab + grid</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Shell da sub-aba Estrutura operacional, grid de Módulos e integração.</span><span class="t-en">Estrutura operacional sub-tab shell, Módulos grid and integration.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">812841</span><span class="t"><span class="t-pt">[BE] Endpoint de operational-modules</span><span class="t-en">[BE] operational-modules endpoint</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Endpoint de backend que expõe os Módulos da estrutura operacional de um contrato (<code>GET /v1/contracts/{id}/operational-modules</code>).</span><span class="t-en">Backend endpoint exposing a contract's operational-structure Modules (<code>GET /v1/contracts/{id}/operational-modules</code>).</span></div></details>
+            <details class="tk" data-status="open"><summary><span class="id">812842</span><span class="t"><span class="t-pt">Conectar Módulos ao endpoint real</span><span class="t-en">Wire Módulos to the real endpoint</span></span><span class="chip open"><span class="t-pt">em aberto</span><span class="t-en">open</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Conectar a sub-aba Módulos ao endpoint real de operational-modules — em refinamento.</span><span class="t-en">Wire the Módulos sub-tab to the real operational-modules endpoint — in refinement.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 807111 — US-6.1 Validation queue -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">807111</span><span class="title">US-6.1 · <span class="t-pt">Ver a fila global de validação</span><span class="t-en">View the global validation queue</span></span><span class="chip active"><span class="t-pt">ativa</span><span class="t-en">active</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:75%"></i></div><span class="s-frac">3/4 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812726</span><span class="t"><span class="t-pt">[BE] Rotas da fila de validação</span><span class="t-en">[BE] Validation-queue API routes</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Rotas de API da fila de validação.</span><span class="t-en">Validation-queue API routes.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">813733</span><span class="t"><span class="t-pt">Camada de dados, mock & i18n</span><span class="t-en">Data layer, mock & i18n</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Camada de dados, mock e i18n da fila de validação.</span><span class="t-en">Validation-queue data layer, mock and i18n.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">813734</span><span class="t"><span class="t-pt">View e página da fila</span><span class="t-en">Queue view & page</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">View e página da fila de validação (US-6.1).</span><span class="t-en">Validation-queue view and page (US-6.1).</span></div></details>
+            <details class="tk" data-status="review"><summary><span class="id">813742</span><span class="t"><span class="t-pt">Conectar a fila ao endpoint real</span><span class="t-en">Wire the queue to the live endpoint</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Conectar a fila de validação ao <code>GET /v1/validation-queue</code> real — em code review.</span><span class="t-en">Wire the validation queue to the live <code>GET /v1/validation-queue</code> — in code review.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 807112 — US-6.2 Extraction status -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">807112</span><span class="title">US-6.2 · <span class="t-pt">Ver o status de extração na fila</span><span class="t-en">See extraction status in the queue</span></span><span class="chip active"><span class="t-pt">ativa</span><span class="t-en">active</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:67%"></i></div><span class="s-frac">2/3 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="review"><summary><span class="id">812727</span><span class="t"><span class="t-pt">[BE] Rota de estado do pipeline</span><span class="t-en">[BE] Pipeline-state API route</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Rota de API que expõe o estado do pipeline de extração — em code review.</span><span class="t-en">Pipeline-state API route exposing the extraction pipeline state — in code review.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">813832</span><span class="t"><span class="t-pt">Modelo, mapeamento, mock & i18n do status</span><span class="t-en">Status model, mapping, mock & i18n</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Modelo, mapeamento, mock e i18n do status de validação.</span><span class="t-en">Validation-status model, mapping, mock and i18n.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">813833</span><span class="t"><span class="t-pt">Coluna e badge de status</span><span class="t-en">Status column & badge</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Coluna e badge de status na fila de validação.</span><span class="t-en">Status column and badge in the validation queue.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 807113 — US-6.3 Filter/prioritize/sort -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">807113</span><span class="title">US-6.3 · <span class="t-pt">Filtrar, priorizar e ordenar a fila</span><span class="t-en">Filter, prioritize and sort the queue</span></span><span class="chip active"><span class="t-pt">ativa</span><span class="t-en">active</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:67%"></i></div><span class="s-frac">2/3 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812728</span><span class="t"><span class="t-pt">[BE] Rotas de filtro e ordenação</span><span class="t-en">[BE] Filter & sort API routes</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Rotas de API de filtro e ordenação da fila de validação.</span><span class="t-en">Filter and sort validation-queue API routes.</span></div></details>
+            <details class="tk" data-status="done"><summary><span class="id">814360</span><span class="t"><span class="t-pt">Views de filtro, priorização e ordenação</span><span class="t-en">Filter, prioritize & sort views</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Views de filtro, priorização e ordenação da fila de validação (+ mock).</span><span class="t-en">Filter, prioritize and sort views for the validation queue (+ mock).</span></div></details>
+            <details class="tk" data-status="active"><summary><span class="id">814361</span><span class="t"><span class="t-pt">Conectar filtros ao endpoint real</span><span class="t-en">Wire filters to the live endpoint</span></span><span class="chip active"><span class="t-pt">bloqueada</span><span class="t-en">blocked</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Conectar os filtros e a ordenação da fila ao endpoint real — bloqueada, aguardando o endpoint.</span><span class="t-en">Wire the queue filters and sort to the live endpoint — blocked, waiting on the endpoint.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 807101 — US-5.2 CL filter -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">807101</span><span class="title">US-5.2 · <span class="t-pt">Filtrar a visão do contrato por centro de lucro (CL)</span><span class="t-en">Filter the contract view by profit center (CL)</span></span><span class="chip active"><span class="t-pt">ativa</span><span class="t-en">active</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:33%"></i></div><span class="s-frac">1/3 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812739</span><span class="t"><span class="t-pt">[DevOps] Repositório do serviço de Data Pipeline</span><span class="t-en">[DevOps] Data Pipeline service repository</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Criação do repositório do novo serviço de Data Pipeline (DevOps) — resolvida.</span><span class="t-en">Created the repository for the new Data Pipeline service (DevOps) — resolved.</span></div></details>
+            <details class="tk" data-status="active"><summary><span class="id">812729</span><span class="t"><span class="t-pt">[BE] (POC) Ingestão de dados de CL</span><span class="t-en">[BE] (POC) CL data ingestion</span></span><span class="chip active"><span class="t-pt">em dev</span><span class="t-en">in dev</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">POC de ingestão de dados de CL (Contracts CDM → Dremio → ADF → DB local) — em desenvolvimento.</span><span class="t-en">POC of CL data ingestion (Contracts CDM → Dremio → ADF → local DB) — in development.</span></div></details>
+            <details class="tk" data-status="open"><summary><span class="id">815711</span><span class="t"><span class="t-pt">Conectar o seletor de CL aos dados reais</span><span class="t-en">Wire the CL selector to live data</span></span><span class="chip open"><span class="t-pt">em aberto</span><span class="t-en">open</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Conectar o seletor de CL do detalhe do contrato e o scoping aos dados reais — a fazer.</span><span class="t-en">Wire the contract-detail CL selector and scoping to live data — to do.</span></div></details>
+          </div>
+        </details>
+
+        <!-- 812461 — Associate a customer during upload -->
+        <details class="sg" open>
+          <summary class="sg-head">
+            <div class="top"><span class="id">812461</span><span class="title"><span class="t-pt">Associar um cliente durante o upload de contratos</span><span class="t-en">Associate a customer during contract uploads</span></span><span class="chip active"><span class="t-pt">ativa</span><span class="t-en">active</span></span><span class="chev">›</span></div>
+            <div class="s-prog"><div class="s-bar"><i style="width:13%"></i></div><span class="s-frac">1/8 tasks</span></div>
+          </summary>
+          <div class="sg-tasks">
+            <details class="tk" data-status="done"><summary><span class="id">812808</span><span class="t"><span class="t-pt">Popular o banco com dados de mock</span><span class="t-en">Populate the DB with mock data</span></span><span class="chip done"><span class="t-pt">concluído</span><span class="t-en">completed</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Populou o banco com dados de mock completos (cliente &gt; contrato &gt; documento &gt; chunk &gt; label &gt; review).</span><span class="t-en">Populated the DB with complete mock data (client &gt; contract &gt; document &gt; chunk &gt; label &gt; review).</span></div></details>
+            <details class="tk" data-status="active"><summary><span class="id">812838</span><span class="t"><span class="t-pt">Camada de ORM + migrações</span><span class="t-en">ORM layer + migrations</span></span><span class="chip active"><span class="t-pt">em dev</span><span class="t-en">in dev</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Camada de ORM que garante o schema e controla as migrações — em desenvolvimento.</span><span class="t-en">ORM layer enforcing the schema and controlling migrations — in development.</span></div></details>
+            <details class="tk" data-status="review"><summary><span class="id">815740</span><span class="t"><span class="t-pt">Camada de dados + seletor de Cliente</span><span class="t-en">Data layer + Cliente picker</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Camada de dados e seletor de Cliente (fundação) do fluxo de associação.</span><span class="t-en">Data layer and Cliente picker (foundation) for the associate flow.</span></div></details>
+            <details class="tk" data-status="review"><summary><span class="id">815741</span><span class="t"><span class="t-pt">Shell do modal + gatilho pós-upload</span><span class="t-en">Modal shell + post-upload trigger</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Shell do modal de associação e gatilho disparado após o upload.</span><span class="t-en">Association modal shell and post-upload trigger.</span></div></details>
+            <details class="tk" data-status="review"><summary><span class="id">815742</span><span class="t"><span class="t-pt">Destino do documento</span><span class="t-en">Document destination</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Destino do documento: criar novo ou anexar a um contrato aberto.</span><span class="t-en">Document destination: create new or attach to an open contract.</span></div></details>
+            <details class="tk" data-status="review"><summary><span class="id">815743</span><span class="t"><span class="t-pt">Tipo de documento + submit</span><span class="t-en">Document type + submit</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Tipo de documento e submit "Associar e processar".</span><span class="t-en">Document type and the "Associate and process" submit.</span></div></details>
+            <details class="tk" data-status="review"><summary><span class="id">815744</span><span class="t"><span class="t-pt">Conectar o fluxo ao backend real</span><span class="t-en">Wire the flow to the real backend</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Conectar o fluxo de associação ao backend real.</span><span class="t-en">Wire the associate flow to the real backend.</span></div></details>
+            <details class="tk" data-status="review"><summary><span class="id">815745</span><span class="t"><span class="t-pt">[BE] Endpoint de listagem de clientes</span><span class="t-en">[BE] Customers-list endpoint</span></span><span class="chip review"><span class="t-pt">em review</span><span class="t-en">in review</span></span><span class="chev">›</span></summary><div class="desc"><span class="t-pt">Endpoint de listagem de clientes (<code>GET /v1/clients</code>).</span><span class="t-en">Customers-list endpoint (<code>GET /v1/clients</code>).</span></div></details>
+          </div>
+        </details>
+
+      </div>
+      <p class="empty-all"><span class="t-pt">Nenhuma task nesta categoria.</span><span class="t-en">No tasks in this category.</span></p>
+
+      <p class="foot-note"><span class="t-pt">O fluxo "associar cliente" (812461) foi construído no fim de semana (18–19 jul); pela convenção, o fim de semana conta para a semana que se encerrou.</span><span class="t-en">The "associate customer" flow (812461) was built over the weekend (Jul 18–19); by convention, the weekend counts toward the week that just ended.</span></p>
+    </main>
+
+    <aside class="sidebar" aria-label="Sprint metrics">
+      <div class="card gains-card">
+        <h3><span class="t-pt">Ganhos com IA</span><span class="t-en">AI gains</span></h3>
+        <div class="gval"><span class="t-pt">2,5</span><span class="t-en">2.5</span><small>×</small></div>
+        <p class="gcap"><span class="t-pt">vs. sênior sem IA · 115h economizadas</span><span class="t-en">vs. senior dev without AI · 115h saved</span></p>
+        <a class="glink" href="gains.html"><span class="t-pt">ver análise completa →</span><span class="t-en">view full analysis →</span></a>
+      </div>
+      <div class="card">
+        <h3><span class="t-pt">Progresso (tasks)</span><span class="t-en">Progress (tasks)</span></h3>
+        <div class="ring"><div class="hole"><div><div class="pct">67%</div><div class="sub"><span class="t-pt">concluído</span><span class="t-en">complete</span></div></div></div></div>
+        <p class="ring-cap"><span class="t-pt"><b>26</b> de <b>39</b> tasks concluídas</span><span class="t-en"><b>26</b> of <b>39</b> tasks completed</span></p>
+      </div>
+      <div class="card">
+        <h3><span class="t-pt">Por status</span><span class="t-en">By status</span></h3>
+        <div class="stack" aria-hidden="true"><i class="s-done" style="width:66.7%"></i><i class="s-review" style="width:20.5%"></i><i class="s-active" style="width:7.7%"></i><i class="s-open" style="width:5.1%"></i></div>
+        <div class="legend">
+          <div class="row"><span class="dot done"></span><span class="t-pt">Concluídos</span><span class="t-en">Completed</span> <b>26</b></div>
+          <div class="row"><span class="dot review"></span><span class="t-pt">Em review</span><span class="t-en">In review</span> <b>8</b></div>
+          <div class="row"><span class="dot active"></span><span class="t-pt">Em andamento</span><span class="t-en">In progress</span> <b>3</b></div>
+          <div class="row"><span class="dot open"></span><span class="t-pt">Em aberto</span><span class="t-en">Open</span> <b>2</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="t-pt">Entregas por dia</span><span class="t-en">Deliveries per day</span></h3>
+        <div class="days">
+          <div class="col"><span class="n">0</span><div class="b zero" style="height:3px"></div><span class="lbl"><span class="t-pt">seg</span><span class="t-en">Mon</span></span></div>
+          <div class="col"><span class="n">3</span><div class="b" style="height:19px"></div><span class="lbl"><span class="t-pt">ter</span><span class="t-en">Tue</span></span></div>
+          <div class="col"><span class="n">7</span><div class="b" style="height:45px"></div><span class="lbl"><span class="t-pt">qua</span><span class="t-en">Wed</span></span></div>
+          <div class="col"><span class="n">10</span><div class="b" style="height:64px"></div><span class="lbl"><span class="t-pt">qui</span><span class="t-en">Thu</span></span></div>
+          <div class="col"><span class="n">5</span><div class="b" style="height:32px"></div><span class="lbl"><span class="t-pt">sex</span><span class="t-en">Fri</span></span></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  // Status filter — keys off data-status, independent of language
+  (function () {
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.fchip'));
+    var groups = Array.prototype.slice.call(document.querySelectorAll('.sg'));
+    var emptyAll = document.querySelector('.empty-all');
+    function apply(filter) {
+      var totalShown = 0;
+      groups.forEach(function (g) {
+        var tasks = Array.prototype.slice.call(g.querySelectorAll('details.tk'));
+        var visible = 0;
+        tasks.forEach(function (t) {
+          var match = filter === 'all' || t.getAttribute('data-status') === filter;
+          t.hidden = !match; if (match) visible++;
+        });
+        var showGroup = filter === 'all' || visible > 0;
+        g.hidden = !showGroup;
+        if (showGroup) {
+          totalShown++;
+          if (filter !== 'all') g.open = true;
+          else g.open = !g.classList.contains('na');
+        }
+      });
+      emptyAll.style.display = totalShown ? 'none' : 'block';
+    }
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        chips.forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
+        apply(c.getAttribute('data-filter'));
+      });
+    });
+  })();
+
+  // Language switcher (PT/EN) — inline dual-text toggled via [data-lang]; patches attrs CSS can't reach
+  (function () {
+    var root = document.documentElement;
+    var KEY = 'report-lang';
+    var STR = {
+      en: { htmllang: 'en',    title: 'Sprint Report — Week 1',   desc: 'Sprint Report — Week 1 (Jul 13 – 17, 2026)',   ariaFilter: 'Filter tasks by status',  ariaMetrics: 'Sprint metrics' },
+      pt: { htmllang: 'pt-BR', title: 'Sprint Report — Semana 1', desc: 'Sprint Report — Semana 1 (13 – 17 jul 2026)', ariaFilter: 'Filtrar tasks por status', ariaMetrics: 'Métricas da sprint' }
+    };
+    var btns = Array.prototype.slice.call(document.querySelectorAll('.lang'));
+    var filterGroup = document.querySelector('.filters');
+    var sidebar = document.querySelector('.sidebar');
+    var meta = document.querySelector('meta[name="description"]');
+    function setLang(lang) {
+      if (lang !== 'pt' && lang !== 'en') lang = 'en';
+      var s = STR[lang];
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', s.htmllang);
+      document.title = s.title;
+      if (meta) meta.setAttribute('content', s.desc);
+      if (filterGroup) filterGroup.setAttribute('aria-label', s.ariaFilter);
+      if (sidebar) sidebar.setAttribute('aria-label', s.ariaMetrics);
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang-set') === lang ? 'true' : 'false'); });
+      try { localStorage.setItem(KEY, lang); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    setLang(saved || 'en');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () { setLang(b.getAttribute('data-lang-set')); });
+    });
+  })();
+</script>
+</body>
+</html>

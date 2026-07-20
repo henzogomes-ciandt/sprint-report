@@ -41,6 +41,7 @@
   .sprint-head h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
   .sprint-head .range { font-family: var(--mono); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
   .badge { font-size: 10.5px; font-weight: 700; font-family: var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 2px 9px; border-radius: 999px; background: var(--good-soft); color: var(--good); }
+  .badge.closed { background: var(--neutral-soft); color: var(--neutral); }
 
   .links { margin-top: 16px; display: grid; grid-template-columns: 1fr; gap: 10px; }
   .lk { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; transition: background-color .15s ease, border-color .15s ease; }
@@ -76,9 +77,26 @@
   <div class="sprints">
     <section class="sprint">
       <div class="sprint-head">
+        <h2>Sprint 2</h2>
+        <span class="range"><span class="t-pt">13 – 24 jul 2026</span><span class="t-en">Jul 13 – 24, 2026</span></span>
+        <span class="badge"><span class="t-pt">atual</span><span class="t-en">current</span></span>
+      </div>
+      <div class="links">
+        <a class="lk week" href="sprint-2/week-1/index.html">
+          <span class="ico">1</span>
+          <span class="lk-main">
+            <div class="lk-title"><span class="t-pt">Semana 1</span><span class="t-en">Week 1</span></div>
+            <div class="lk-meta"><span class="t-pt">13 – 17 jul · 39 tasks · ganhos 2,5×</span><span class="t-en">Jul 13 – 17 · 39 tasks · gains 2.5×</span></div>
+          </span>
+          <span class="arrow">›</span>
+        </a>
+      </div>
+    </section>
+    <section class="sprint">
+      <div class="sprint-head">
         <h2>Sprint 1</h2>
         <span class="range"><span class="t-pt">29 jun – 10 jul 2026</span><span class="t-en">Jun 29 – Jul 10, 2026</span></span>
-        <span class="badge"><span class="t-pt">atual</span><span class="t-en">current</span></span>
+        <span class="badge closed"><span class="t-pt">encerrada</span><span class="t-en">closed</span></span>
       </div>
       <div class="links">
         <a class="lk full" href="sprint-1/index.html">
